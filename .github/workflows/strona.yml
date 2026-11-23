@@ -1,0 +1,44 @@
+# Publikuje stronę Prawo planu na GitHub Pages i co 3 godziny odświeża „Szybkie newsy”.
+# Wymaga: Settings → Pages → Source: „GitHub Actions”.
+name: Strona i szybkie newsy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 */3 * * *'   # co 3 godziny (czas UTC)
+  workflow_dispatch:          # ręczne uruchomienie z zakładki Actions
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publikacja:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Przygotuj stronę i pobierz newsy
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path _site | Out-Null
+          Get-ChildItem -File | Where-Object { $_.Name -notmatch '^(README|LICENSE)' } | Copy-Item -Destination _site
+          ./scripts/newsy.ps1 -Out _site/news.json
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
