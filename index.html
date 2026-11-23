@@ -139,6 +139,7 @@ select{font:inherit;font-size:13.5px;padding:6px 8px;border:1px solid var(--line
 .tag.lo{background:var(--lo-soft);color:var(--lo)}
 .tag.ok{background:var(--ok-soft);color:var(--ok)}
 .tag.kind{background:var(--kind-bg);color:var(--kind-ink)}
+.tag.cat{background:transparent;color:var(--moss);box-shadow:inset 0 0 0 1px var(--line-strong)}
 .tag.new{background:var(--new);color:var(--new-ink);letter-spacing:.06em}
 
 /* szybkie newsy */
@@ -157,6 +158,15 @@ select{font:inherit;font-size:13.5px;padding:6px 8px;border:1px solid var(--line
 .seg button[aria-pressed="true"]{background:var(--mahogany);color:#FFFFFF}
 .rows.news .r-meta{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px}
 .note{color:var(--mut);font-size:12.5px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+/* normy */
+#n-cats{padding:4px 0 6px}
+#n-info{margin:8px 0 0;padding-top:0;border-top:0}
+.row.nrm{grid-template-columns:14rem minmax(0,1fr) auto;align-items:baseline}
+.r-num b{display:block;font:500 13px/1.4 var(--f-mono);color:var(--ink)}
+.r-num small{display:block;font:400 12px/1.4 var(--f-mono);color:var(--mut)}
+.row.nrm .t{font-weight:500}
+.row.nrm .r-side a{font-size:13px;white-space:nowrap}
+@media (max-width:640px){.row.nrm{grid-template-columns:minmax(0,1fr)}}
 details summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:14px;padding:12px 0 4px}
 .links{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;padding:14px 0 4px}
 .links a{display:block;border:1px solid var(--line);padding:12px 14px;text-decoration:none;min-width:0;background:var(--sheet)}
@@ -207,6 +217,7 @@ footer p{margin:0 0 6px;max-width:90ch}
     <a href="#obserwowane"><b data-i18n="nav.watch"></b><span id="n-watch"></span></a>
     <a href="#sejm"><b data-i18n="nav.sejm"></b><span id="n-sejm"></span></a>
     <a href="#dziennik"><b data-i18n="nav.du"></b><span id="n-du"></span></a>
+    <a href="#normy"><b data-i18n="nav.norms"></b><span id="n-norms"></span></a>
     <a href="#zrodla"><b data-i18n="nav.links"></b></a>
   </div>
 </nav>
@@ -275,11 +286,29 @@ footer p{margin:0 0 6px;max-width:90ch}
       <p data-i18n="duSub"></p>
     </div></div>
     <div class="sheet-b">
+      <div class="chips" id="du-cats" style="padding-top:14px"></div>
       <div class="tools">
         <input type="search" id="q" data-i18n-ph="filter" aria-label="Filtr">
         <label><input type="checkbox" id="low"> <span data-i18n="showLow"></span></label>
       </div>
       <div id="du"><p class="empty" data-i18n="loadingShort"></p></div>
+    </div>
+  </section>
+
+  <section class="sheet" id="s-normy" data-tab="normy" hidden>
+    <div class="sheet-h"><div>
+      <h2 data-i18n="normsTitle"></h2>
+      <p data-i18n="normsSub"></p>
+    </div></div>
+    <div class="sheet-b">
+      <div class="tools">
+        <div class="seg" id="n-view" role="group" aria-label="Widok"></div>
+        <input type="search" id="nq" data-i18n-ph="normsFilter" aria-label="Filtr norm">
+      </div>
+      <div class="chips" id="n-cats"></div>
+      <p class="note" id="n-info" hidden></p>
+      <div id="norms"><p class="empty" data-i18n="loadingShort"></p></div>
+      <p class="note" data-i18n="normsNote"></p>
     </div>
   </section>
 
@@ -332,18 +361,18 @@ const CONFIG = {
     /dodatk\p{L}* mieszkaniow/iu
   ],
   watched: [
-    { eli: 'DU/1994/414',  pl: 'Prawo budowlane', en: 'Construction Law' },
-    { eli: 'DU/2002/690',  pl: 'Warunki techniczne (WT 2002)', en: 'Technical Conditions for Buildings (WT 2002)' },
-    { eli: 'DU/2003/717',  pl: 'Ustawa o planowaniu i zagospodarowaniu przestrzennym', en: 'Spatial Planning and Development Act' },
-    { eli: 'DU/2020/1609', pl: 'Rozporządzenie o zakresie i formie projektu budowlanego', en: 'Regulation on the scope and form of building designs' },
-    { eli: 'DU/2001/42',   pl: 'Ustawa o samorządach zawodowych architektów i inżynierów', en: 'Act on professional chambers of architects and engineers' },
-    { eli: 'DU/2003/1568', pl: 'Ustawa o ochronie zabytków', en: 'Monument Protection Act' },
-    { eli: 'DU/2019/1696', pl: 'Ustawa o zapewnianiu dostępności', en: 'Accessibility Act' },
-    { eli: 'DU/2014/1200', pl: 'Ustawa o charakterystyce energetycznej budynków', en: 'Energy Performance of Buildings Act' },
-    { eli: 'DU/2015/376',  pl: 'Rozporządzenie o metodologii charakterystyki energetycznej', en: 'Regulation on energy performance methodology' },
-    { eli: 'DU/2010/719',  pl: 'Rozporządzenie o ochronie przeciwpożarowej budynków', en: 'Regulation on fire protection of buildings' },
-    { eli: 'DU/2004/881',  pl: 'Ustawa o wyrobach budowlanych', en: 'Construction Products Act' },
-    { eli: 'DU/2021/2454', pl: 'Rozporządzenie o dokumentacji projektowej (zamówienia publiczne)', en: 'Regulation on design documentation (public procurement)' }
+    { eli: 'DU/1994/414',  cat: 'budowlane',  pl: 'Prawo budowlane', en: 'Construction Law' },
+    { eli: 'DU/2002/690',  cat: 'budowlane',  pl: 'Warunki techniczne (WT 2002)', en: 'Technical Conditions for Buildings (WT 2002)' },
+    { eli: 'DU/2020/1609', cat: 'budowlane',  pl: 'Rozporządzenie o zakresie i formie projektu budowlanego', en: 'Regulation on the scope and form of building designs' },
+    { eli: 'DU/2003/717',  cat: 'planowanie', pl: 'Ustawa o planowaniu i zagospodarowaniu przestrzennym', en: 'Spatial Planning and Development Act' },
+    { eli: 'DU/2003/1568', cat: 'zabytki',    pl: 'Ustawa o ochronie zabytków', en: 'Monument Protection Act' },
+    { eli: 'DU/2010/719',  cat: 'ppoz',       pl: 'Rozporządzenie o ochronie przeciwpożarowej budynków', en: 'Regulation on fire protection of buildings' },
+    { eli: 'DU/2019/1696', cat: 'dostepnosc', pl: 'Ustawa o zapewnianiu dostępności', en: 'Accessibility Act' },
+    { eli: 'DU/2014/1200', cat: 'energia',    pl: 'Ustawa o charakterystyce energetycznej budynków', en: 'Energy Performance of Buildings Act' },
+    { eli: 'DU/2015/376',  cat: 'energia',    pl: 'Rozporządzenie o metodologii charakterystyki energetycznej', en: 'Regulation on energy performance methodology' },
+    { eli: 'DU/2004/881',  cat: 'wyroby',     pl: 'Ustawa o wyrobach budowlanych', en: 'Construction Products Act' },
+    { eli: 'DU/2001/42',   cat: 'zawod',      pl: 'Ustawa o samorządach zawodowych architektów i inżynierów', en: 'Act on professional chambers of architects and engineers' },
+    { eli: 'DU/2021/2454', cat: 'zamowienia', pl: 'Rozporządzenie o dokumentacji projektowej (zamówienia publiczne)', en: 'Regulation on design documentation (public procurement)' }
   ],
   sejmPhrases: [
     'Prawo budowlane', 'planowaniu i zagospodarowaniu przestrzennym', 'ochronie zabytków',
@@ -376,6 +405,65 @@ const CONFIG = {
   ]
 };
 
+/* ============ KLUCZOWE POLSKIE NORMY ============ */
+// PKN nie udostępnia otwartych danych, więc lista jest stała, a aktualne wydanie sprawdza się przyciskiem „PKN”.
+// „ed” podane tylko tam, gdzie wydanie zweryfikowano w katalogu PKN (XI 2026).
+const KEY_NORMS = [
+  { cat: 'konstrukcje', num: 'PN-EN 1990', pl: 'Eurokod: podstawy projektowania konstrukcji', en: 'Eurocode: basis of structural design' },
+  { cat: 'konstrukcje', num: 'PN-EN 1991-1-1', pl: 'Eurokod 1: ciężar objętościowy, ciężar własny, obciążenia użytkowe w budynkach', en: 'Eurocode 1: densities, self-weight, imposed loads for buildings' },
+  { cat: 'konstrukcje', num: 'PN-EN 1991-1-3', pl: 'Eurokod 1: obciążenie śniegiem', en: 'Eurocode 1: snow loads' },
+  { cat: 'konstrukcje', num: 'PN-EN 1991-1-4', pl: 'Eurokod 1: oddziaływania wiatru', en: 'Eurocode 1: wind actions' },
+  { cat: 'konstrukcje', num: 'PN-EN 1992-1-1', pl: 'Eurokod 2: projektowanie konstrukcji z betonu', en: 'Eurocode 2: design of concrete structures' },
+  { cat: 'konstrukcje', num: 'PN-EN 1993-1-1', pl: 'Eurokod 3: projektowanie konstrukcji stalowych', en: 'Eurocode 3: design of steel structures' },
+  { cat: 'konstrukcje', num: 'PN-EN 1995-1-1', pl: 'Eurokod 5: projektowanie konstrukcji drewnianych', en: 'Eurocode 5: design of timber structures' },
+  { cat: 'konstrukcje', num: 'PN-EN 1996-1-1', pl: 'Eurokod 6: projektowanie konstrukcji murowych', en: 'Eurocode 6: design of masonry structures' },
+  { cat: 'konstrukcje', num: 'PN-EN 1997-1', pl: 'Eurokod 7: projektowanie geotechniczne', en: 'Eurocode 7: geotechnical design' },
+  { cat: 'cieplne', num: 'PN-EN ISO 6946', pl: 'Opór cieplny i współczynnik przenikania ciepła U – metody obliczania', en: 'Thermal resistance and U-value – calculation methods' },
+  { cat: 'cieplne', num: 'PN-EN ISO 13788', pl: 'Temperatura powierzchni (ryzyko pleśni) i kondensacja międzywarstwowa', en: 'Surface temperature (mould risk) and interstitial condensation' },
+  { cat: 'cieplne', num: 'PN-EN ISO 10211', pl: 'Mostki cieplne – szczegółowe obliczenia', en: 'Thermal bridges – detailed calculations' },
+  { cat: 'cieplne', num: 'PN-EN ISO 14683', pl: 'Mostki cieplne liniowe – metody uproszczone', en: 'Linear thermal bridges – simplified methods' },
+  { cat: 'cieplne', num: 'PN-EN ISO 13370', pl: 'Wymiana ciepła przez grunt', en: 'Heat transfer via the ground' },
+  { cat: 'cieplne', num: 'PN-EN ISO 52016-1', pl: 'Zapotrzebowanie na energię do ogrzewania i chłodzenia', en: 'Energy needs for heating and cooling' },
+  { cat: 'cieplne', num: 'PN-EN 12831-1', pl: 'Projektowe obciążenie cieplne budynku', en: 'Design heat load of buildings' },
+  { cat: 'akustyka', num: 'PN-B-02151-2', pl: 'Ochrona przed hałasem w budynkach – dopuszczalny poziom dźwięku w pomieszczeniach', en: 'Noise protection – permissible sound levels in rooms' },
+  { cat: 'akustyka', num: 'PN-B-02151-3', ed: '2015-10', pl: 'Ochrona przed hałasem w budynkach – izolacyjność akustyczna przegród i elementów budowlanych', en: 'Noise protection – sound insulation of partitions and building elements' },
+  { cat: 'akustyka', num: 'PN-B-02151-4', ed: '2015-06', pl: 'Ochrona przed hałasem w budynkach – warunki pogłosowe i zrozumiałość mowy', en: 'Noise protection – reverberation and speech intelligibility' },
+  { cat: 'akustyka', num: 'PN-B-02151-5', ed: '2026-08', pl: 'Ochrona przed hałasem w budynkach – część 5 (nowe wydanie 2026)', en: 'Noise protection in buildings – part 5 (new 2026 edition)' },
+  { cat: 'akustyka', num: 'PN-EN ISO 717-1', pl: 'Ocena izolacyjności akustycznej – dźwięki powietrzne', en: 'Rating of sound insulation – airborne sound' },
+  { cat: 'akustyka', num: 'PN-EN ISO 717-2', pl: 'Ocena izolacyjności akustycznej – dźwięki uderzeniowe', en: 'Rating of sound insulation – impact sound' },
+  { cat: 'akustyka', num: 'PN-EN ISO 12354-1', pl: 'Obliczanie właściwości akustycznych budynków – izolacyjność od dźwięków powietrznych', en: 'Building acoustics estimation – airborne sound insulation' },
+  { cat: 'swiatlo', num: 'PN-EN 17037', pl: 'Światło dzienne w budynkach', en: 'Daylight in buildings' },
+  { cat: 'swiatlo', num: 'PN-EN 12464-1', ed: '2022-01', pl: 'Oświetlenie miejsc pracy we wnętrzach', en: 'Lighting of indoor work places' },
+  { cat: 'swiatlo', num: 'PN-EN 1838', pl: 'Oświetlenie awaryjne', en: 'Emergency lighting' },
+  { cat: 'ppoz', num: 'PN-EN 13501-1', pl: 'Klasyfikacja ogniowa – reakcja na ogień', en: 'Fire classification – reaction to fire' },
+  { cat: 'ppoz', num: 'PN-EN 13501-2', pl: 'Klasyfikacja ogniowa – odporność ogniowa', en: 'Fire classification – fire resistance' },
+  { cat: 'ppoz', num: 'PN-B-02852', pl: 'Gęstość obciążenia ogniowego i względny czas trwania pożaru', en: 'Fire load density and relative fire duration' },
+  { cat: 'ppoz', num: 'PN-EN 1991-1-2', pl: 'Eurokod 1: oddziaływania na konstrukcje w warunkach pożaru', en: 'Eurocode 1: actions on structures exposed to fire' },
+  { cat: 'dostepnosc', num: 'PN-EN 17210', pl: 'Dostępność i użyteczność środowiska zbudowanego – wymagania funkcjonalne', en: 'Accessibility and usability of the built environment – functional requirements' },
+  { cat: 'dostepnosc', num: 'PN-ISO 21542', pl: 'Dostępność i użyteczność środowiska zbudowanego', en: 'Accessibility and usability of the built environment' },
+  { cat: 'dostepnosc', num: 'PN-EN 81-70', pl: 'Dźwigi (windy) dostępne dla osób z niepełnosprawnościami', en: 'Lifts accessible to persons with disabilities' },
+  { cat: 'wentylacja', num: 'PN-B-03430', pl: 'Wentylacja w budynkach mieszkalnych, zamieszkania zbiorowego i użyteczności publicznej', en: 'Ventilation in residential and public buildings' },
+  { cat: 'wentylacja', num: 'PN-EN 16798-1', pl: 'Parametry środowiska wewnętrznego (powietrze, komfort cieplny, światło, akustyka)', en: 'Indoor environmental input parameters' },
+  { cat: 'wentylacja', num: 'PN-EN 16798-3', pl: 'Wentylacja budynków niemieszkalnych', en: 'Ventilation for non-residential buildings' },
+  { cat: 'dokumentacja', num: 'PN-B-01025', pl: 'Rysunek budowlany – oznaczenia graficzne na rysunkach architektoniczno-budowlanych', en: 'Construction drawings – graphic symbols on architectural drawings' },
+  { cat: 'dokumentacja', num: 'PN-ISO 9836', pl: 'Wskaźniki powierzchniowe i kubaturowe (obliczanie powierzchni)', en: 'Area and volume indicators (area calculation)' },
+  { cat: 'dokumentacja', num: 'PN-ISO 4157-1', pl: 'Rysunek budowlany – systemy oznaczeń budynków i części budynków', en: 'Construction drawings – designation systems for buildings' },
+  { cat: 'dokumentacja', num: 'PN-EN ISO 7519', pl: 'Rysunek budowlany – zasady przedstawiania na rysunkach przeglądowych i zestawieniowych', en: 'Construction drawings – general arrangement and assembly drawings' },
+  { cat: 'dokumentacja', num: 'PN-EN ISO 19650-1', pl: 'BIM – organizacja informacji o obiektach budowlanych: pojęcia i zasady', en: 'BIM – organization of information: concepts and principles' },
+  { cat: 'dokumentacja', num: 'PN-EN ISO 19650-2', pl: 'BIM – faza realizacji (dostarczania) obiektu', en: 'BIM – delivery phase of assets' },
+  { cat: 'zrownowazone', num: 'PN-EN 15978', pl: 'Ocena środowiskowa budynków (LCA) – metoda obliczania', en: 'Environmental performance of buildings (LCA)' },
+  { cat: 'zrownowazone', num: 'PN-EN 15804', pl: 'Deklaracje środowiskowe wyrobów budowlanych (EPD)', en: 'Environmental product declarations (EPD)' },
+  { cat: 'zrownowazone', num: 'PN-EN 15643', pl: 'Zrównoważone obiekty budowlane – ramy oceny', en: 'Sustainability of construction works – assessment framework' },
+  { cat: 'instalacje', num: 'PN-EN 12056-1', pl: 'Kanalizacja grawitacyjna wewnątrz budynków', en: 'Gravity drainage systems inside buildings' },
+  { cat: 'instalacje', num: 'PN-EN 806-1', pl: 'Instalacje wodociągowe wewnątrz budynków', en: 'Water installations inside buildings' },
+  { cat: 'instalacje', num: 'PN-HD 60364-1', pl: 'Instalacje elektryczne niskiego napięcia', en: 'Low-voltage electrical installations' },
+  { cat: 'instalacje', num: 'PN-EN 62305-1', pl: 'Ochrona odgromowa', en: 'Lightning protection' },
+  { cat: 'wyroby', num: 'PN-EN 14351-1', pl: 'Okna i drzwi zewnętrzne – właściwości użytkowe', en: 'Windows and external doors – performance characteristics' },
+  { cat: 'wyroby', num: 'PN-EN 13830', pl: 'Ściany osłonowe (fasady)', en: 'Curtain walling' }
+];
+const NORM_CATS = ['konstrukcje', 'cieplne', 'akustyka', 'swiatlo', 'ppoz', 'dostepnosc', 'wentylacja', 'dokumentacja', 'zrownowazone', 'instalacje', 'wyroby'];
+const ICS_GROUPS = ['91.010', '91.020', '91.040', '91.060', '91.080', '91.090', '91.100', '91.120', '91.140', '91.160', '91.180', '91.190', '91.200', '91.220', '93'];
+
 /* ============ TEKSTY PL / EN ============ */
 const I18N = {
   pl: {
@@ -385,7 +473,28 @@ const I18N = {
     loading: 'Pobieram dane z API Sejmu…', loadingShort: 'Ładowanie…', updated: 'Zaktualizowano', requests: 'zapytań',
     firstNote: 'pierwsza wizyta: od następnej strona pokaże, co się zmieniło', problems: 'problemy',
     failed: 'Nie udało się pobrać danych', failedHint: 'Sprawdź połączenie i kliknij „Odśwież”.',
-    nav: { news: 'Nowości', quick: 'Szybkie newsy', cal: 'Kalendarz', watch: 'Obserwowane akty', sejm: 'Projekty w Sejmie', du: 'Dziennik Ustaw', links: 'Źródła' },
+    cats: { budowlane: 'Prawo budowlane i WT', planowanie: 'Planowanie przestrzenne', zabytki: 'Zabytki', ppoz: 'Ochrona przeciwpożarowa',
+            dostepnosc: 'Dostępność', energia: 'Energia i klimat', mieszkalnictwo: 'Mieszkalnictwo', wyroby: 'Wyroby budowlane',
+            zawod: 'Zawód architekta', zamowienia: 'Zamówienia publiczne', inne: 'Inne' },
+    allCats: 'Wszystkie',
+    normsTitle: 'Normy',
+    normsSub: 'Kluczowe Polskie Normy dla architekta oraz wszystkie aktualne normy ISO dotyczące budownictwa, aktualizowane automatycznie z otwartych danych ISO.',
+    normsView: { pn: 'Kluczowe PN dla architekta', iso: 'Wszystkie aktualne ISO – budownictwo' },
+    normsFilter: 'Filtruj, np. akustyka, 12464, BIM, okna…',
+    normsMissing: 'Lista norm ISO pojawi się po najbliższym uruchomieniu automatu na GitHubie.',
+    normsNone: 'Brak norm pasujących do filtra.',
+    normsIsoInfo: 'Tytuły norm ISO są po angielsku. Polskie odpowiedniki mają zwykle numer PN-EN ISO lub PN-ISO.',
+    checkPKN: 'Wydanie w PKN', openISO: 'iso.org', edVerified: 'wydanie',
+    normCats: { konstrukcje: 'Konstrukcje (Eurokody)', cieplne: 'Fizyka budowli i energia', akustyka: 'Akustyka', swiatlo: 'Światło i oświetlenie',
+                ppoz: 'Ochrona przeciwpożarowa', dostepnosc: 'Dostępność', wentylacja: 'Wentylacja i komfort', dokumentacja: 'Rysunek, dokumentacja i BIM',
+                zrownowazone: 'Zrównoważone budownictwo', instalacje: 'Instalacje', wyroby: 'Okna, drzwi, fasady' },
+    ics: { '91.010': 'Budownictwo – ogólnie', '91.020': 'Planowanie przestrzenne', '91.040': 'Budynki', '91.060': 'Elementy budynków',
+           '91.080': 'Konstrukcje budynków', '91.090': 'Konstrukcje zewnętrzne', '91.100': 'Materiały budowlane',
+           '91.120': 'Ochrona budynków (ciepło, akustyka, ogień, wilgoć)', '91.140': 'Instalacje w budynkach', '91.160': 'Oświetlenie',
+           '91.180': 'Wykończenie wnętrz', '91.190': 'Akcesoria budowlane', '91.200': 'Technologia budowy', '91.220': 'Sprzęt budowlany',
+           '93': 'Inżynieria lądowa (drogi, mosty, roboty ziemne)' },
+    normsNote: 'Polskie Normy wydaje i sprzedaje PKN, który nie udostępnia ich listy w otwartej formie – aktualne wydanie sprawdzisz przyciskiem „Wydanie w PKN”. Treść norm jest płatna; bezpłatnie przeczytasz je w czytelni PKN, a wiele bibliotek uczelni technicznych daje studentom dostęp do norm online. Stosowanie Polskich Norm jest dobrowolne, chyba że przepis (np. Warunki Techniczne) powołuje konkretną normę. Normy ISO pochodzą z ISO Open Data.',
+    nav: { news: 'Nowości', quick: 'Szybkie newsy', norms: 'Normy', cal: 'Kalendarz', watch: 'Obserwowane akty', sejm: 'Projekty w Sejmie', du: 'Dziennik Ustaw', links: 'Źródła' },
     quickTitle: 'Szybkie newsy',
     quickSub: 'Najświeższe wiadomości z architektury i budownictwa z całego świata, odświeżane automatycznie co 3 godziny.',
     newsUpdated: 'Ostatnia aktualizacja: {n}, działające źródła: {s}.',
@@ -436,7 +545,28 @@ const I18N = {
     loading: 'Fetching data from the Sejm API…', loadingShort: 'Loading…', updated: 'Updated', requests: 'requests',
     firstNote: 'first visit: from your next visit the page will show what changed', problems: 'problems',
     failed: 'Could not fetch the data', failedHint: 'Check your connection and click “Refresh”.',
-    nav: { news: 'What’s new', quick: 'Quick news', cal: 'Calendar', watch: 'Watched acts', sejm: 'Bills in the Sejm', du: 'Journal of Laws', links: 'Sources' },
+    cats: { budowlane: 'Building law & WT', planowanie: 'Spatial planning', zabytki: 'Monuments & heritage', ppoz: 'Fire safety',
+            dostepnosc: 'Accessibility', energia: 'Energy & climate', mieszkalnictwo: 'Housing', wyroby: 'Construction products',
+            zawod: 'Architectural profession', zamowienia: 'Public procurement', inne: 'Other' },
+    allCats: 'All',
+    normsTitle: 'Standards',
+    normsSub: 'Key Polish Standards for architects and all current ISO standards for construction, updated automatically from ISO Open Data.',
+    normsView: { pn: 'Key Polish Standards', iso: 'All current ISO – construction' },
+    normsFilter: 'Filter, e.g. acoustics, 12464, BIM, windows…',
+    normsMissing: 'The ISO list will appear after the next run of the GitHub automation.',
+    normsNone: 'No standards match the filter.',
+    normsIsoInfo: 'ISO titles are in English. Polish adoptions are usually numbered PN-EN ISO or PN-ISO.',
+    checkPKN: 'Edition at PKN', openISO: 'iso.org', edVerified: 'edition',
+    normCats: { konstrukcje: 'Structures (Eurocodes)', cieplne: 'Building physics & energy', akustyka: 'Acoustics', swiatlo: 'Light & lighting',
+                ppoz: 'Fire safety', dostepnosc: 'Accessibility', wentylacja: 'Ventilation & comfort', dokumentacja: 'Drawings, documentation & BIM',
+                zrownowazone: 'Sustainable construction', instalacje: 'Building services', wyroby: 'Windows, doors, façades' },
+    ics: { '91.010': 'Construction industry', '91.020': 'Physical & town planning', '91.040': 'Buildings', '91.060': 'Elements of buildings',
+           '91.080': 'Structures of buildings', '91.090': 'External structures', '91.100': 'Construction materials',
+           '91.120': 'Protection of buildings (heat, sound, fire, moisture)', '91.140': 'Installations in buildings', '91.160': 'Lighting',
+           '91.180': 'Interior finishing', '91.190': 'Building accessories', '91.200': 'Construction technology', '91.220': 'Construction equipment',
+           '93': 'Civil engineering (roads, bridges, earthworks)' },
+    normsNote: 'Polish Standards are published and sold by PKN, which does not offer an open list – check the current edition with the “Edition at PKN” button. Standards are paid; you can read them for free in the PKN reading room, and many technical university libraries give students online access. Applying Polish Standards is voluntary unless a regulation (e.g. the Technical Conditions) refers to a specific one. ISO data comes from ISO Open Data.',
+    nav: { news: 'What’s new', quick: 'Quick news', norms: 'Standards', cal: 'Calendar', watch: 'Watched acts', sejm: 'Bills in the Sejm', du: 'Journal of Laws', links: 'Sources' },
     quickTitle: 'Quick news',
     quickSub: 'The latest architecture and construction news from around the world, refreshed automatically every 3 hours.',
     newsUpdated: 'Last update: {n}, sources working: {s}.',
@@ -493,7 +623,7 @@ const API = 'https://api.sejm.gov.pl';
 const LS_STATE = 'prawo-planu:stan:v1';
 const LS_WIN = 'prawo-planu:okres';
 const LS_LANG = 'prawo-planu:jezyk';
-const TABS = ['nowosci', 'newsy', 'kalendarz', 'obserwowane', 'sejm', 'dziennik', 'zrodla'];
+const TABS = ['nowosci', 'newsy', 'kalendarz', 'obserwowane', 'sejm', 'dziennik', 'normy', 'zrodla'];
 const STAT_TABS = ['nowosci', 'nowosci', 'kalendarz', 'sejm', 'obserwowane'];
 const REF_TYPES = {
   'Akty zmieniające': 'amend',
@@ -562,6 +692,27 @@ function priority(title) {
 }
 const tagPrio = p => `<span class="tag ${p === 'wysoki' ? 'hi' : p === 'niski' ? 'lo' : 'mid'}">${esc(T.prio[p] || T.prio.sredni)}</span>`;
 const tagKind = k => `<span class="tag kind">${esc(k)}</span>`;
+
+/* ============ KATEGORIE AKTÓW ============ */
+// Kolejność = priorytet: akt o zabytkach trafia do „Zabytki”, a nie do ogólnej kategorii budowlanej.
+const CATS = [
+  { id: 'zabytki',        re: /zabyt|konserwator|dziedzictw|pomnik\p{L}* historii|krajobraz\p{L}* kulturow/iu, kw: ['zabytki', 'wojewódzcy konserwatorzy zabytków'] },
+  { id: 'planowanie',     re: /zagospodarowani\p{L}* przestrzenn|planowani\p{L}* przestrzenn|plan\p{L}* ogóln|plan\p{L}* miejscow|warunk\p{L}* zabudowy|urbanist|rewitalizacj|lokalizacji inwestycji|ład\p{L}* przestrzenn/iu, kw: ['planowanie przestrzenne', 'urbanistyka i architektura'] },
+  { id: 'ppoz',           re: /przeciwpożar|pożar|ewakuac/iu, kw: ['przeciwpożarowa ochrona'] },
+  { id: 'dostepnosc',     re: /dostępności|niepełnospraw|szczególnymi potrzebami/iu, kw: [] },
+  { id: 'energia',        re: /energetyczn|energi|odnawialn|ciepłownic|klimat|emisj|fotowolta|pomp\p{L}* ciepła/iu, kw: ['energetyka', 'odnawialne źródła energii', 'energetyczne prawo'] },
+  { id: 'mieszkalnictwo', re: /mieszka|deweloper|spółdzielni/iu, kw: ['budownictwo mieszkaniowe', 'spółdzielczość mieszkaniowa'] },
+  { id: 'wyroby',         re: /wyrob\p{L}* budowlan|materiał\p{L}* budowlan/iu, kw: ['budowlane materiały'] },
+  { id: 'zawod',          re: /samorząd\p{L}* zawodow|uprawnie\p{L}* budowlan|architektów|inżynierów budownictwa/iu, kw: [] },
+  { id: 'zamowienia',     re: /zamówie\p{L}* publiczn|zamówienia na roboty|wykonawc/iu, kw: [] },
+  { id: 'budowlane',      re: /Prawo budowlane|budowl|budynk|budow|obiekt\p{L}* budowlan/iu, kw: ['budowlane prawo', 'budownictwo', 'roboty budowlane', 'nadzór techniczno-budowlany'] }
+];
+const CAT_ORDER = ['budowlane', 'planowanie', 'zabytki', 'ppoz', 'dostepnosc', 'energia', 'mieszkalnictwo', 'wyroby', 'zawod', 'zamowienia', 'inne'];
+function categorize(text, keywords) {
+  const out = CATS.filter(c => c.re.test(text || '') || (keywords || []).some(k => c.kw.includes(k))).map(c => c.id);
+  return out.length ? out : ['inne'];
+}
+const tagCat = id => id ? `<span class="tag cat">${esc((T.cats && T.cats[id]) || id)}</span>` : '';
 const tagNew = on => on ? `<span class="tag new">${esc(T.isNew)}</span>` : '';
 function tagStatus(s) {
   if (!s) return '';
@@ -601,6 +752,7 @@ function setLang(l) {
   applyStatic();
   if (model) render(); else if (loadingNow) progress();
   renderNews();
+  renderNorms();
 }
 
 /* ============ POBIERANIE ============ */
@@ -665,7 +817,8 @@ async function fetchActs(errors) {
     status: it.status || '',
     promulgation: short(it.promulgation),
     entry: short(it.entryIntoForce),
-    prio: priority(it.title || '')
+    prio: priority(it.title || ''),
+    cats: categorize(it.title, it.keywords)
   }));
 }
 
@@ -710,6 +863,7 @@ async function fetchSejm(errors) {
           key, number: String(p.number), title: p.title || '', desc: p.description || '',
           start: short(p.processStartDate), change: p.changeDate || '',
           status: p.passed ? 'uchwalony' : (p.closureDate ? 'zamknięty' : 'w toku'),
+          cats: categorize((p.title || '') + ' ' + (p.description || '')),
           eli: p.ELI || '', url: `https://www.sejm.gov.pl/Sejm${term}.nsf/PrzebiegProc.xsp?nr=${p.number}`
         });
       }
@@ -803,7 +957,7 @@ function buildNews(m, win) {
     if (!(a.isNew || (d != null && d >= -win && d <= 0))) continue;
     out.push({
       date: a.promulgation, isNew: a.isNew,
-      tags: tagNew(a.isNew) + tagKind(`${T.lbl.dzu} · ${typeText(a.type)}`) + tagPrio(a.prio),
+      tags: tagNew(a.isNew) + tagKind(`${T.lbl.dzu} · ${typeText(a.type)}`) + tagPrio(a.prio) + tagCat(a.cats[0]),
       title: a.title, url: actUrl(a.eli),
       meta: `<span class="mono">${esc(a.display)}</span>${isapLink(a.address, a.eli)}`,
       side: a.entry ? `<span class="lbl">${esc(T.lbl.entry)}</span><b>${esc(fmtDate(a.entry))}</b>${esc(daysLabel(a.entry))}` : ''
@@ -816,7 +970,7 @@ function buildNews(m, win) {
     const t = m.titles[r.id];
     out.push({
       date: r.date, isNew: r.isNew,
-      tags: tagNew(r.isNew) + tagKind(refLabel(r)) + tagPrio('wysoki'),
+      tags: tagNew(r.isNew) + tagKind(refLabel(r)) + tagPrio('wysoki') + tagCat(w.cat),
       title: `${nameOf(w)}: ${t ? t.t : displayAddr(r.id)}`, url: actUrl(r.id),
       meta: `<span class="mono">${esc(t ? t.d : displayAddr(r.id))}</span>${isapLink(t && t.a, r.id)}`,
       side: ''
@@ -843,7 +997,7 @@ function buildCalendar(m) {
     if (a.prio === 'niski') continue;
     const d = daysFromToday(a.entry);
     if (d != null && d >= 0 && d <= CONFIG.calendarDays) {
-      map.set(a.eli + '|' + a.entry, { date: a.entry, title: a.title, url: actUrl(a.eli), src: T.lbl.journal, prio: a.prio, meta: a.display });
+      map.set(a.eli + '|' + a.entry, { date: a.entry, title: a.title, url: actUrl(a.eli), src: T.lbl.journal, prio: a.prio, meta: a.display, cat: a.cats[0] });
     }
   }
   for (const w of m.watched) for (const r of w.future) {
@@ -855,12 +1009,12 @@ function buildCalendar(m) {
     const names = prev && prev.watchNames ? prev.watchNames.concat(nameOf(w)) : [nameOf(w)];
     map.set(key, {
       date: r.date, title: t ? t.t : displayAddr(r.id), url: actUrl(r.id), prio: 'wysoki',
-      src: `${T.lbl.amends}: ${names.join(', ')}`, watchNames: names, meta: t ? t.d : displayAddr(r.id)
+      src: `${T.lbl.amends}: ${names.join(', ')}`, watchNames: names, meta: t ? t.d : displayAddr(r.id), cat: w.cat
     });
   }
   for (const t of CONFIG.terms) {
     const d = daysFromToday(t.date);
-    if (d != null && d >= 0) map.set('T|' + t.date + t.pl, { date: t.date, title: t[lang] || t.pl, url: t.url, src: (lang === 'en' ? 'EU' : 'UE') + ' – EPBD 2024/1275', prio: 'sredni', meta: '' });
+    if (d != null && d >= 0) map.set('T|' + t.date + t.pl, { date: t.date, title: t[lang] || t.pl, url: t.url, src: (lang === 'en' ? 'EU' : 'UE') + ' – EPBD 2024/1275', prio: 'sredni', meta: '', cat: 'energia' });
   }
   return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
@@ -913,14 +1067,14 @@ function render() {
         month = mo;
         html += `<h3 class="month">${esc(T.months[+mo.slice(5, 7) - 1])} ${mo.slice(0, 4)}</h3><ul class="rows">`;
       }
-      html += rowHtml({ date: c.date, sub: daysLabel(c.date), tags: tagPrio(c.prio), title: c.title, url: c.url,
+      html += rowHtml({ date: c.date, sub: daysLabel(c.date), tags: tagPrio(c.prio) + tagCat(c.cat), title: c.title, url: c.url,
         meta: `${c.meta ? `<span class="mono">${esc(c.meta)}</span> · ` : ''}${esc(c.src)}` });
     }
     $('#cal').innerHTML = html + '</ul>';
   }
 
-  // obserwowane akty
-  $('#watch').innerHTML = `<ul class="rows">${m.watched.map(w => {
+  // obserwowane akty – pogrupowane w kategorie
+  const watchRow = w => {
     const last = w.past[0];
     const lastHtml = last
       ? `<a href="${esc(actUrl(last.id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(last.date))}</b></a><small>${esc(daysLabel(last.date))}</small>`
@@ -940,12 +1094,16 @@ function render() {
       `<div class="r-col"><span class="lbl">${esc(T.lbl.amendments)}</span><b>${w.amendCount}</b></div>` +
       `<div class="r-col"><span class="lbl">${esc(T.lbl.lastAmend)}</span>${lastHtml}</div>` +
       `<div class="r-col"><span class="lbl">${esc(T.lbl.scheduled)}</span>${futHtml}</div></li>`;
-  }).join('')}</ul>`;
+  };
+  $('#watch').innerHTML = CAT_ORDER.map(c => {
+    const ws = m.watched.filter(w => (w.cat || 'inne') === c);
+    return ws.length ? `<h3 class="month">${esc(T.cats[c])}</h3><ul class="rows">${ws.map(watchRow).join('')}</ul>` : '';
+  }).join('');
 
   // Sejm
   const procRow = p => rowHtml({
     date: short(p.change), sub: T.lbl.lastChange,
-    tags: tagNew(p.isNew) + tagStatus(p.status),
+    tags: tagNew(p.isNew) + tagStatus(p.status) + tagCat(p.cats && p.cats[0]),
     title: p.title, url: p.url,
     meta: `${esc(T.lbl.print)} <span class="mono">${esc(p.number)}</span> · ${esc(T.lbl.submitted)} ${esc(fmtDate(p.start))}${p.desc ? ' · ' + esc(p.desc) : ''}`,
     side: p.eli ? `<span class="lbl">${esc(T.lbl.published)}</span><a href="${esc(actUrl(p.eli))}" target="_blank" rel="noopener"><b>${esc(displayAddr(p.eli))}</b></a>` : ''
@@ -954,29 +1112,38 @@ function render() {
     (activeP.length ? `<ul class="rows">${activeP.map(procRow).join('')}</ul>` : `<p class="empty">${esc(T.sejmEmpty)}</p>`) +
     (doneP.length ? `<details><summary>${esc(T.sejmDone)} (${doneP.length})</summary><ul class="rows">${doneP.map(procRow).join('')}</ul></details>` : '');
 
-  // Dziennik Ustaw
+  // Dziennik Ustaw – filtr kategorii (akt może należeć do kilku)
   const acts = m.acts.slice().sort((a, b) => b.promulgation.localeCompare(a.promulgation));
+  const counts = {};
+  acts.forEach(a => a.cats.forEach(c => { counts[c] = (counts[c] || 0) + 1; }));
+  if (duCat && !counts[duCat]) duCat = '';
+  $('#du-cats').innerHTML = `<button type="button" class="chip" data-cat="" aria-pressed="${!duCat}">${esc(T.allCats)}<b>${acts.length}</b></button>` +
+    CAT_ORDER.filter(c => counts[c]).map(c => `<button type="button" class="chip" data-cat="${c}" aria-pressed="${duCat === c}">${esc(T.cats[c])}<b>${counts[c]}</b></button>`).join('');
   $('#du').innerHTML = acts.length
     ? `<ul class="rows" id="du-list">${acts.map(a => rowHtml({
         date: a.promulgation, sub: T.lbl.promulgated,
-        tags: tagNew(a.isNew) + tagPrio(a.prio) + tagStatus(a.status),
+        tags: tagNew(a.isNew) + tagPrio(a.prio) + tagStatus(a.status) + a.cats.slice(0, 2).map(tagCat).join(''),
         title: a.title, url: actUrl(a.eli), meta: `<span class="mono">${esc(a.display)}</span>${a.type ? ' · ' + esc(typeText(a.type)) : ''}${isapLink(a.address, a.eli)}`,
         side: a.entry ? `<span class="lbl">${esc(T.lbl.inForceFrom)}</span><b>${esc(fmtDate(a.entry))}</b>` : '',
-        attrs: ` data-p="${esc(a.prio)}"`
+        attrs: ` data-p="${esc(a.prio)}" data-cats=" ${esc(a.cats.join(' '))} "`
       })).join('')}</ul><p class="empty" id="du-none" hidden>${esc(T.duNone)}</p>`
     : `<p class="empty">${esc(T.duEmpty)}</p>`;
   filterDu();
 }
 
+let duCat = '';
 function filterDu() {
   const q = $('#q').value.trim().toLowerCase();
   const low = $('#low').checked;
   let shown = 0;
   document.querySelectorAll('#du-list > .row').forEach(r => {
-    const ok = (!q || r.textContent.toLowerCase().includes(q)) && (low || r.dataset.p !== 'niski');
+    const ok = (!q || r.textContent.toLowerCase().includes(q)) &&
+               (low || r.dataset.p !== 'niski' || duCat) &&
+               (!duCat || (r.dataset.cats || '').includes(' ' + duCat + ' '));
     r.hidden = !ok;
     if (ok) shown++;
   });
+  document.querySelectorAll('#du-cats .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === duCat)));
   const none = $('#du-none');
   if (none) none.hidden = shown > 0;
 }
@@ -1111,6 +1278,69 @@ function renderNews() {
     : `<p class="empty">${esc(T.newsEmpty)}</p>`;
 }
 
+/* ============ NORMY ============ */
+// Kluczowe PN – lista stała (KEY_NORMS); ISO – normy.json z automatu (ISO Open Data).
+let NORMS = null;
+const normsState = { view: 'pn', cat: '', q: '' };
+const pknUrl = num => 'https://sklep.pkn.pl/catalogsearch/result/?q=' + encodeURIComponent(num);
+const icsGroup = ics => String(ics).startsWith('93') ? '93' : String(ics).split('.').slice(0, 2).join('.');
+
+async function loadNorms() {
+  try {
+    const r = await fetch('normy.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    NORMS = await r.json();
+    NORMS.iso = (NORMS.iso || []).map(s => Object.assign({}, s, { grp: icsGroup(s.ics) }));
+  } catch (e) { NORMS = { error: e.message, iso: [] }; }
+  renderNorms();
+}
+
+function renderNorms() {
+  const isoCount = NORMS && NORMS.iso ? NORMS.iso.length : 0;
+  $('#n-view').innerHTML = [['pn', `${T.normsView.pn} (${KEY_NORMS.length})`], ['iso', `${T.normsView.iso}${isoCount ? ` (${isoCount})` : ''}`]]
+    .map(([v, l]) => `<button type="button" data-v="${v}" aria-pressed="${normsState.view === v}">${esc(l)}</button>`).join('');
+  $('#n-norms').textContent = KEY_NORMS.length + isoCount;
+  const q = normsState.q.trim().toLowerCase();
+  const box = $('#norms');
+  $('#n-info').hidden = normsState.view !== 'iso';
+  $('#n-info').textContent = T.normsIsoInfo;
+
+  if (normsState.view === 'pn') {
+    const counts = {};
+    KEY_NORMS.forEach(n => { counts[n.cat] = (counts[n.cat] || 0) + 1; });
+    $('#n-cats').innerHTML = `<button type="button" class="chip" data-cat="" aria-pressed="${!normsState.cat}">${esc(T.allCats)}<b>${KEY_NORMS.length}</b></button>` +
+      NORM_CATS.map(c => `<button type="button" class="chip" data-cat="${c}" aria-pressed="${normsState.cat === c}">${esc(T.normCats[c])}<b>${counts[c] || 0}</b></button>`).join('');
+    const match = n => (!normsState.cat || n.cat === normsState.cat) && (!q || `${n.num} ${n.ed || ''} ${n.pl} ${n.en}`.toLowerCase().includes(q));
+    const row = n => `<li class="row nrm"><div class="r-num"><b>${esc(n.num)}${n.ed ? ':' + esc(n.ed) : ''}</b>${n.ed ? `<small>${esc(T.edVerified)} ${esc(n.ed)}</small>` : ''}</div>` +
+      `<div class="r-main"><span class="t">${esc(n[lang] || n.pl)}</span></div>` +
+      `<div class="r-side"><a href="${esc(pknUrl(n.num))}" target="_blank" rel="noopener">${esc(T.checkPKN)} ↗</a></div></li>`;
+    const html = NORM_CATS.map(c => {
+      const list = KEY_NORMS.filter(n => n.cat === c && match(n));
+      return list.length ? `<h3 class="month">${esc(T.normCats[c])}</h3><ul class="rows">${list.map(row).join('')}</ul>` : '';
+    }).join('');
+    box.innerHTML = html || `<p class="empty">${esc(T.normsNone)}</p>`;
+    return;
+  }
+
+  // widok ISO
+  if (!NORMS) { $('#n-cats').innerHTML = ''; box.innerHTML = `<p class="empty">${esc(T.loadingShort)}</p>`; return; }
+  if (NORMS.error || !NORMS.iso.length) { $('#n-cats').innerHTML = ''; box.innerHTML = `<p class="empty">${esc(T.normsMissing)}</p>`; return; }
+  const counts = {};
+  NORMS.iso.forEach(s => { counts[s.grp] = (counts[s.grp] || 0) + 1; });
+  const groups = ICS_GROUPS.filter(g => counts[g]);
+  if (normsState.cat && !counts[normsState.cat]) normsState.cat = '';
+  $('#n-cats').innerHTML = `<button type="button" class="chip" data-cat="" aria-pressed="${!normsState.cat}">${esc(T.allCats)}<b>${NORMS.iso.length}</b></button>` +
+    groups.map(g => `<button type="button" class="chip" data-cat="${g}" aria-pressed="${normsState.cat === g}">${esc(T.ics[g] || g)}<b>${counts[g]}</b></button>`).join('');
+  const row = s => `<li class="row nrm"><div class="r-num"><b>${esc(s.ref)}</b><small>${esc(s.type)} · ICS ${esc(s.ics)}</small></div>` +
+    `<div class="r-main"><a class="t" href="https://www.iso.org/standard/${encodeURIComponent(s.id)}.html" target="_blank" rel="noopener">${esc(s.title)}</a></div>` +
+    `<div class="r-side">${esc(fmtDate(s.date))}</div></li>`;
+  const html = groups.filter(g => !normsState.cat || g === normsState.cat).map(g => {
+    const list = NORMS.iso.filter(s => s.grp === g && (!q || `${s.ref} ${s.title}`.toLowerCase().includes(q)));
+    return list.length ? `<h3 class="month">${esc(g === '93' ? '93' : g)} · ${esc(T.ics[g] || g)}</h3><ul class="rows">${list.map(row).join('')}</ul>` : '';
+  }).join('');
+  box.innerHTML = html || `<p class="empty">${esc(T.normsNone)}</p>`;
+}
+
 /* ============ ZAKŁADKI ============ */
 function currentTab() {
   const h = decodeURIComponent(location.hash.slice(1));
@@ -1143,6 +1373,10 @@ document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click
 $('#win').addEventListener('change', () => { try { localStorage.setItem(LS_WIN, $('#win').value); } catch (e) { /* ignoruj */ } render(); });
 $('#q').addEventListener('input', filterDu);
 $('#low').addEventListener('change', filterDu);
+$('#du-cats').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; duCat = b.dataset.cat || ''; filterDu(); });
+$('#n-view').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; normsState.view = b.dataset.v; normsState.cat = ''; renderNorms(); });
+$('#n-cats').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; normsState.cat = b.dataset.cat || ''; renderNorms(); });
+$('#nq').addEventListener('input', () => { normsState.q = $('#nq').value; renderNorms(); });
 $('#refresh').addEventListener('click', () => { run().catch(fail); loadNews(); });
 $('#s-newsy').addEventListener('click', e => {
   const b = e.target.closest('button');
@@ -1162,6 +1396,8 @@ function fail(e) {
 run().catch(fail);
 renderNews();
 loadNews();
+renderNorms();
+loadNorms();
 })();
 </script>
 </body>

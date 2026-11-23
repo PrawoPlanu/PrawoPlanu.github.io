@@ -160,3 +160,16 @@ $dir = Split-Path -Parent $Out
 if ($dir -and -not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
 [IO.File]::WriteAllText($Out, $json, (New-Object System.Text.UTF8Encoding $false))
 Write-Host ("Zapisano {0} wpisów do {1}" -f $items.Count, $Out)
+
+# Normy ISO (normy.json obok news.json) – osobny skrypt, błąd nie zatrzymuje publikacji newsów
+$normyScript = Join-Path $PSScriptRoot 'normy.ps1'
+if (Test-Path $normyScript) {
+    $prevUrl = ''
+    if ($env:GITHUB_REPOSITORY) {
+        $owner, $repo = $env:GITHUB_REPOSITORY.Split('/')
+        if ($repo -ieq "$owner.github.io") { $site = "https://$($owner.ToLower()).github.io/" } else { $site = "https://$($owner.ToLower()).github.io/$repo/" }
+        $prevUrl = $site + 'normy.json'
+    }
+    try { & $normyScript -Out (Join-Path (Split-Path -Parent $Out) 'normy.json') -Previous $prevUrl }
+    catch { Write-Host "Normy: $($_.Exception.Message)" }
+}
