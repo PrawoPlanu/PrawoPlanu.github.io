@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://api.sejm.gov.pl" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geom:ital,wght@0,300..900;1,300..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Paleta: Moss #6A6A53 · Olive #9B9879 · Mahogany #4D342D · Egg Shell #EDE7DB · Linen #DDCCB7
    Jeden jasny motyw (świadomie bez trybu ciemnego).
@@ -17,12 +17,12 @@
   --moss:#6A6A53; --olive:#9B9879; --mahogany:#4D342D; --eggshell:#EDE7DB; --linen:#DDCCB7;
   --paper:#EDE7DB; --sheet:#F7F3EC; --ink:#4D342D; --mut:#62624C; --line:#DDCCB7; --line-strong:#9B9879;
   --acc:#5A5A45; --acc-soft:#E6E3D2;
-  --head-bg:#9B9879; --head-ink:#2F201B; --head-mut:#3A2722; --head-line:rgba(47,32,27,.42); --head-grid:rgba(77,52,45,.08);
-  --btn-bg:#4D342D; --btn-ink:#F7F3EC;
+  --head-bg:#9B9879; --head-ink:#FFFFFF; --head-mut:rgba(255,255,255,.9); --head-line:rgba(255,255,255,.55); --head-grid:rgba(255,255,255,.09);
+  --btn-bg:#4D342D; --btn-ink:#FFFFFF;
   --hi:#8A3B2B; --hi-soft:#F1DDD3; --mid:#6E5A1E; --mid-soft:#EEE5CB; --ok:#4F5139; --ok-soft:#E2E2CF; --lo:#7E786A; --lo-soft:#E8E1D4;
   --new:#4D342D; --new-ink:#EDE7DB; --kind-bg:#DDCCB7; --kind-ink:#4D342D;
-  --f-display:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;
-  --f-body:"IBM Plex Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-display:"Geom","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-body:"Geom","Segoe UI",system-ui,-apple-system,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
   color-scheme:light;
 }
@@ -41,12 +41,13 @@ a:hover{text-decoration-thickness:2px}
 
 /* tabliczka rysunkowa */
 .tb{background-color:var(--head-bg);color:var(--head-ink);background-image:linear-gradient(var(--head-grid) 1px,transparent 1px),linear-gradient(90deg,var(--head-grid) 1px,transparent 1px);background-size:16px 16px;padding-block:calc(env(safe-area-inset-top,0px) + 30px) 22px}
-.tb .lbl{color:var(--head-mut)}
+.tb .lbl{color:var(--head-mut);font-weight:600}
+.tb h1,.tb p,.tb b,.tb .lbl,.tb .status{text-shadow:0 1px 2px rgba(47,32,27,.28)}
 .tb-grid{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(3,minmax(0,1fr)) auto;border:1.5px solid var(--head-line)}
 .tb-grid>div{padding:12px 16px;border-left:1px solid var(--head-line);min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
 .tb-grid>div:first-child{border-left:none}
-h1{font:italic 600 clamp(38px,5.4vw,56px)/1 var(--f-display);margin:2px 0 0;letter-spacing:-.005em;text-wrap:balance}
-.tb-name p{margin:4px 0 0;color:var(--head-mut);font-size:14px;max-width:52ch}
+h1{font:700 clamp(34px,5vw,52px)/1.05 var(--f-display);margin:4px 0 0;letter-spacing:-.02em;text-wrap:balance}
+.tb-name p{margin:4px 0 0;color:var(--head-mut);font-size:14.5px;font-weight:500;max-width:52ch}
 .tb-cell b{font:500 14px/1.35 var(--f-mono);overflow-wrap:anywhere}
 .tb-act{align-items:stretch;justify-content:center!important}
 .btn{font:600 14px var(--f-body);background:var(--btn-bg);color:var(--btn-ink);border:0;border-radius:6px;padding:10px 18px;cursor:pointer;white-space:nowrap}
@@ -67,26 +68,31 @@ h1{font:italic 600 clamp(38px,5.4vw,56px)/1 var(--f-display);margin:2px 0 0;lett
 
 /* nawigacja */
 nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
-nav.tabs .wrap{display:flex;gap:6px 22px;overflow-x:auto;padding-block:11px;scrollbar-width:none}
-nav.tabs a{font:600 14px var(--f-body);text-decoration:none;white-space:nowrap;color:var(--ink)}
-nav.tabs a:hover{color:var(--acc)}
-nav.tabs a span{font:500 12px var(--f-mono);color:var(--mut);margin-left:5px}
+nav.tabs .wrap{position:relative;display:flex;gap:0 26px;overflow-x:auto;scrollbar-width:none}
+nav.tabs .wrap::-webkit-scrollbar{display:none}
+nav.tabs a{font:500 14.5px var(--f-body);text-decoration:none;white-space:nowrap;color:var(--mut);padding:13px 0 11px;border-bottom:3px solid transparent}
+nav.tabs a b{font-weight:inherit}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a[aria-current="page"]{color:var(--ink);font-weight:700;border-bottom-color:var(--mahogany)}
+nav.tabs a span{font:500 12px var(--f-mono);color:var(--mut);margin-left:6px}
 
 main.wrap{padding-block:20px 40px}
 
 /* liczby */
 .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 18px}
-.stat{background:var(--sheet);padding:12px 16px;min-width:0}
-.stat b{display:block;font:600 38px/1 var(--f-display);font-variant-numeric:lining-nums tabular-nums;margin-bottom:4px}
+.stat{background:var(--sheet);padding:12px 16px;min-width:0;display:block;color:inherit;text-decoration:none}
+a.stat:hover{background:#FFFFFF}
+a.stat:hover span{color:var(--ink)}
+.stat b{display:block;font:600 34px/1.05 var(--f-display);font-variant-numeric:lining-nums tabular-nums;letter-spacing:-.02em;margin-bottom:4px}
 .stat span{font-size:12.5px;color:var(--mut)}
 .stat.is-new b{color:var(--hi)}
 @media (max-width:820px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat:first-child{grid-column:1/-1}}
 
 /* arkusze */
-.sheet{background:var(--sheet);border:1px solid var(--line);margin:0 0 18px;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 56px)}
+.sheet{background:var(--sheet);border:1px solid var(--line);margin:0 0 18px}
 .sheet-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 16px;padding:16px 18px 12px;border-bottom:1px solid var(--line)}
 .sheet-h>div{min-width:0}
-.sheet-h h2{font:600 28px/1.1 var(--f-display);margin:0;text-wrap:balance}
+.sheet-h h2{font:600 24px/1.2 var(--f-display);margin:0;letter-spacing:-.01em;text-wrap:balance}
 .sheet-h p{margin:4px 0 0;color:var(--mut);font-size:13.5px;max-width:72ch}
 .sheet-b{padding:2px 18px 14px}
 .empty{color:var(--mut);padding:14px 0 4px;font-size:14px;margin:0}
@@ -115,6 +121,7 @@ select{font:inherit;font-size:13.5px;padding:6px 8px;border:1px solid var(--line
 .row.w{grid-template-columns:minmax(0,1fr) 11rem 6rem 8.5rem 8.5rem}
 .row.w .r-col{min-width:0;font-size:13px}
 .row.w .r-col b{font:500 13px/1.35 var(--f-mono)}
+.row.w .r-col a{display:block;width:fit-content}
 .row.w .r-col small{display:block;color:var(--mut);font-size:12px}
 @media (max-width:820px){
   .row.w{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -192,7 +199,7 @@ footer p{margin:0 0 6px;max-width:90ch}
 
   <div class="stats" id="stats"></div>
 
-  <section class="sheet" id="nowosci">
+  <section class="sheet" id="s-nowosci" data-tab="nowosci">
     <div class="sheet-h">
       <div>
         <h2 data-i18n="newsTitle"></h2>
@@ -205,7 +212,7 @@ footer p{margin:0 0 6px;max-width:90ch}
     <div class="sheet-b" id="news"><p class="empty" data-i18n="loadingShort"></p></div>
   </section>
 
-  <section class="sheet" id="kalendarz">
+  <section class="sheet" id="s-kalendarz" data-tab="kalendarz" hidden>
     <div class="sheet-h"><div>
       <h2 data-i18n="calTitle"></h2>
       <p data-i18n="calSub"></p>
@@ -213,7 +220,7 @@ footer p{margin:0 0 6px;max-width:90ch}
     <div class="sheet-b" id="cal"><p class="empty" data-i18n="loadingShort"></p></div>
   </section>
 
-  <section class="sheet" id="obserwowane">
+  <section class="sheet" id="s-obserwowane" data-tab="obserwowane" hidden>
     <div class="sheet-h"><div>
       <h2 data-i18n="watchTitle"></h2>
       <p data-i18n="watchSub"></p>
@@ -221,7 +228,7 @@ footer p{margin:0 0 6px;max-width:90ch}
     <div class="sheet-b" id="watch"><p class="empty" data-i18n="loadingShort"></p></div>
   </section>
 
-  <section class="sheet" id="sejm">
+  <section class="sheet" id="s-sejm" data-tab="sejm" hidden>
     <div class="sheet-h"><div>
       <h2 data-i18n="sejmTitle"></h2>
       <p id="sejm-sub"></p>
@@ -229,7 +236,7 @@ footer p{margin:0 0 6px;max-width:90ch}
     <div class="sheet-b" id="sejm-list"><p class="empty" data-i18n="loadingShort"></p></div>
   </section>
 
-  <section class="sheet" id="dziennik">
+  <section class="sheet" id="s-dziennik" data-tab="dziennik" hidden>
     <div class="sheet-h"><div>
       <h2 data-i18n="duTitle"></h2>
       <p data-i18n="duSub"></p>
@@ -243,7 +250,7 @@ footer p{margin:0 0 6px;max-width:90ch}
     </div>
   </section>
 
-  <section class="sheet" id="zrodla">
+  <section class="sheet" id="s-zrodla" data-tab="zrodla" hidden>
     <div class="sheet-h"><div>
       <h2 data-i18n="linksTitle"></h2>
       <p data-i18n="linksSub"></p>
@@ -428,6 +435,8 @@ const API = 'https://api.sejm.gov.pl';
 const LS_STATE = 'prawo-planu:stan:v1';
 const LS_WIN = 'prawo-planu:okres';
 const LS_LANG = 'prawo-planu:jezyk';
+const TABS = ['nowosci', 'kalendarz', 'obserwowane', 'sejm', 'dziennik', 'zrodla'];
+const STAT_TABS = ['nowosci', 'nowosci', 'kalendarz', 'sejm', 'obserwowane'];
 const REF_TYPES = {
   'Akty zmieniające': 'amend',
   'Akty wykonawcze': 'exec',
@@ -508,7 +517,7 @@ function applyStatic() {
   $('#links').innerHTML = CONFIG.links.map(l => { const [n, d] = l[lang] || l.pl; return `<a href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(n)}</b><span>${esc(d)}</span></a>`; }).join('');
   $('#sejm-sub').textContent = T.sejmSub.replace('{term}', model && model.term ? fill(T.sejmTerm, model.term) : '');
   if (!model) {
-    $('#stats').innerHTML = T.stats.map(l => `<div class="stat"><b>–</b><span>${esc(fill(l, currentWindow()))}</span></div>`).join('');
+    $('#stats').innerHTML = T.stats.map((l, i) => `<a class="stat" href="#${STAT_TABS[i]}"><b>–</b><span>${esc(fill(l, currentWindow()))}</span></a>`).join('');
     $('#lastvisit').textContent = '—';
   }
 }
@@ -799,7 +808,7 @@ function render() {
     (m.firstVisit ? ` · ${T.firstNote}` : '') +
     (m.errors.length ? ` · ${T.problems}: ${m.errors.length}` : '');
   const tiles = [newCount, news.length, cal90, activeP.length, m.watched.length];
-  $('#stats').innerHTML = tiles.map((n, i) => `<div class="stat${i === 0 && n > 0 ? ' is-new' : ''}"><b>${n}</b><span>${esc(fill(T.stats[i], win))}</span></div>`).join('');
+  $('#stats').innerHTML = tiles.map((n, i) => `<a class="stat${i === 0 && n > 0 ? ' is-new' : ''}" href="#${STAT_TABS[i]}"><b>${n}</b><span>${esc(fill(T.stats[i], win))}</span></a>`).join('');
   $('#n-news').textContent = news.length;
   $('#n-cal').textContent = cal.length;
   $('#n-watch').textContent = m.watched.length;
@@ -840,8 +849,10 @@ function render() {
     const lastHtml = last
       ? `<a href="${esc(isap(last.id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(last.date))}</b></a><small>${esc(daysLabel(last.date))}</small>`
       : '<small>—</small>';
-    const futHtml = w.future.length
-      ? w.future.map(f => `<a href="${esc(isap(f.id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(f.date))}</b></a>`).join('') + `<small>${esc(daysLabel(w.future[0].date))}</small>`
+    const byDate = new Map();
+    w.future.forEach(f => { if (!byDate.has(f.date)) byDate.set(f.date, []); byDate.get(f.date).push(f); });
+    const futHtml = byDate.size
+      ? [...byDate.entries()].map(([d, list]) => `<a href="${esc(isap(list[0].id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(d))}${list.length > 1 ? ' ×' + list.length : ''}</b></a>`).join('') + `<small>${esc(daysLabel(w.future[0].date))}</small>`
       : `<small>${esc(T.lbl.none)}</small>`;
     return `<li class="row w">` +
       `<div class="r-main"><a class="t" href="${esc(isap(w.eli))}" target="_blank" rel="noopener"><b>${esc(nameOf(w))}</b></a>` +
@@ -891,7 +902,31 @@ function filterDu() {
   if (none) none.hidden = shown > 0;
 }
 
+/* ============ ZAKŁADKI ============ */
+function currentTab() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  return TABS.includes(h) ? h : TABS[0];
+}
+function showTab(fromClick) {
+  const tab = currentTab();
+  document.querySelectorAll('[data-tab]').forEach(s => { s.hidden = s.dataset.tab !== tab; });
+  document.querySelectorAll('nav.tabs a').forEach(a => {
+    const on = a.getAttribute('href') === '#' + tab;
+    if (on) {
+      a.setAttribute('aria-current', 'page');
+      const w = a.parentElement;   // przewiń pasek w poziomie, żeby aktywna zakładka była widoczna (telefon)
+      if (a.offsetLeft < w.scrollLeft || a.offsetLeft + a.offsetWidth > w.scrollLeft + w.clientWidth) w.scrollLeft = Math.max(0, a.offsetLeft - 16);
+    } else a.removeAttribute('aria-current');
+  });
+  if (fromClick) {
+    const top = $('.tb').offsetHeight;   // wróć do początku treści, jeśli strona była przewinięta niżej
+    if (window.scrollY > top) window.scrollTo(0, top);
+  }
+}
+
 /* ============ START ============ */
+window.addEventListener('hashchange', () => showTab(true));
+showTab(false);
 try { const w = localStorage.getItem(LS_WIN); if (w) $('#win').value = w; } catch (e) { /* ignoruj */ }
 lang = pickLang(); T = I18N[lang];
 applyStatic();
