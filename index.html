@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prawo planu</title>
+<meta name="description" content="Prawo planu / Law Plan – zmiany w polskim prawie budowlanym i planistycznym na żywo: Dziennik Ustaw, nowelizacje kluczowych aktów i projekty ustaw w Sejmie.">
+<link rel="preconnect" href="https://api.sejm.gov.pl" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Paleta: Moss #6A6A53 · Olive #9B9879 · Mahogany #4D342D · Egg Shell #EDE7DB · Linen #DDCCB7
+   Układ: nagłówek = tabliczka rysunkowa na mahoniowym tle z siatką; niżej arkusze; wiersz = data | treść | strona */
+:root{
+  --moss:#6A6A53; --olive:#9B9879; --mahogany:#4D342D; --eggshell:#EDE7DB; --linen:#DDCCB7;
+  --paper:#EDE7DB; --sheet:#F7F3EC; --ink:#4D342D; --mut:#62624C; --line:#DDCCB7; --line-strong:#9B9879;
+  --acc:#5A5A45; --acc-soft:#E6E3D2;
+  --head-bg:#4D342D; --head-ink:#EDE7DB; --head-mut:#D3C2AD; --head-line:rgba(221,204,183,.5); --head-grid:rgba(237,231,219,.06);
+  --btn-bg:#DDCCB7; --btn-ink:#4D342D;
+  --hi:#8A3B2B; --hi-soft:#F1DDD3; --mid:#6E5A1E; --mid-soft:#EEE5CB; --ok:#4F5139; --ok-soft:#E2E2CF; --lo:#7E786A; --lo-soft:#E8E1D4;
+  --new:#4D342D; --new-ink:#EDE7DB; --kind-bg:#DDCCB7; --kind-ink:#4D342D;
+  --f-display:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#1C1513; --sheet:#251C19; --ink:#EDE7DB; --mut:#B5B196; --line:#3B302B; --line-strong:#6A6A53;
+    --acc:#C8C5A4; --acc-soft:#2F2B22;
+    --head-bg:#2E201C; --head-ink:#EDE7DB; --head-mut:#BFAE99; --head-line:rgba(221,204,183,.35); --head-grid:rgba(237,231,219,.05);
+    --btn-bg:#DDCCB7; --btn-ink:#4D342D;
+    --hi:#E9A894; --hi-soft:#3D241E; --mid:#DCC787; --mid-soft:#342C18; --ok:#C5C7A3; --ok-soft:#2A2A1F; --lo:#ABA597; --lo-soft:#2C2421;
+    --new:#DDCCB7; --new-ink:#2E201C; --kind-bg:#3B302B; --kind-ink:#DDCCB7; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1C1513; --sheet:#251C19; --ink:#EDE7DB; --mut:#B5B196; --line:#3B302B; --line-strong:#6A6A53;
+  --acc:#C8C5A4; --acc-soft:#2F2B22;
+  --head-bg:#2E201C; --head-ink:#EDE7DB; --head-mut:#BFAE99; --head-line:rgba(221,204,183,.35); --head-grid:rgba(237,231,219,.05);
+  --btn-bg:#DDCCB7; --btn-ink:#4D342D;
+  --hi:#E9A894; --hi-soft:#3D241E; --mid:#DCC787; --mid-soft:#342C18; --ok:#C5C7A3; --ok-soft:#2A2A1F; --lo:#ABA597; --lo-soft:#2C2421;
+  --new:#DDCCB7; --new-ink:#2E201C; --kind-bg:#3B302B; --kind-ink:#DDCCB7; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--f-body);padding-bottom:env(safe-area-inset-bottom,0px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--head-bg)}
+a{color:var(--acc);text-underline-offset:2px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:3px}
+[hidden]{display:none!important}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.lbl{display:block;font:500 10.5px/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+
+/* tabliczka rysunkowa */
+.tb{background-color:var(--head-bg);color:var(--head-ink);background-image:linear-gradient(var(--head-grid) 1px,transparent 1px),linear-gradient(90deg,var(--head-grid) 1px,transparent 1px);background-size:16px 16px;padding-block:calc(env(safe-area-inset-top,0px) + 30px) 22px}
+.tb .lbl{color:var(--head-mut)}
+.tb-grid{display:grid;grid-template-columns:minmax(0,2.3fr) repeat(3,minmax(0,1fr)) auto;border:1.5px solid var(--head-line)}
+.tb-grid>div{padding:12px 16px;border-left:1px solid var(--head-line);min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+.tb-grid>div:first-child{border-left:none}
+h1{font:italic 600 clamp(38px,5.4vw,56px)/1 var(--f-display);margin:2px 0 0;letter-spacing:-.005em;text-wrap:balance}
+.tb-name p{margin:4px 0 0;color:var(--head-mut);font-size:14px;max-width:52ch}
+.tb-cell b{font:500 14px/1.35 var(--f-mono);overflow-wrap:anywhere}
+.tb-act{align-items:stretch;justify-content:center!important}
+.btn{font:600 14px var(--f-body);background:var(--btn-bg);color:var(--btn-ink);border:0;border-radius:6px;padding:10px 18px;cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.04)}
+.btn:disabled{opacity:.6;cursor:progress}
+.lang{display:inline-flex;border:1px solid var(--head-line);border-radius:6px;overflow:hidden;align-self:stretch}
+.lang button{flex:1;font:600 12px var(--f-mono);letter-spacing:.06em;background:transparent;color:var(--head-mut);border:0;padding:7px 12px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-ink)}
+.status{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 0;font-size:13px;color:var(--head-mut)}
+.bar{flex:0 1 240px;height:4px;background:var(--head-line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--btn-bg);transition:width .2s}
+@media (max-width:820px){
+  .tb-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tb-grid>div{border-left:none;border-top:1px solid var(--head-line)}
+  .tb-grid>div:first-child{grid-column:1/-1;border-top:none}
+  .tb-grid>div:nth-child(3),.tb-grid>div:nth-child(5){border-left:1px solid var(--head-line)}
+}
+
+/* nawigacja */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:6px 22px;overflow-x:auto;padding-block:11px;scrollbar-width:none}
+nav.tabs a{font:600 14px var(--f-body);text-decoration:none;white-space:nowrap;color:var(--ink)}
+nav.tabs a:hover{color:var(--acc)}
+nav.tabs a span{font:500 12px var(--f-mono);color:var(--mut);margin-left:5px}
+
+main.wrap{padding-block:20px 40px}
+
+/* liczby */
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 18px}
+.stat{background:var(--sheet);padding:12px 16px;min-width:0}
+.stat b{display:block;font:600 38px/1 var(--f-display);font-variant-numeric:lining-nums tabular-nums;margin-bottom:4px}
+.stat span{font-size:12.5px;color:var(--mut)}
+.stat.is-new b{color:var(--hi)}
+@media (max-width:820px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat:first-child{grid-column:1/-1}}
+
+/* arkusze */
+.sheet{background:var(--sheet);border:1px solid var(--line);margin:0 0 18px;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 56px)}
+.sheet-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 16px;padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+.sheet-h>div{min-width:0}
+.sheet-h h2{font:600 28px/1.1 var(--f-display);margin:0;text-wrap:balance}
+.sheet-h p{margin:4px 0 0;color:var(--mut);font-size:13.5px;max-width:72ch}
+.sheet-b{padding:2px 18px 14px}
+.empty{color:var(--mut);padding:14px 0 4px;font-size:14px;margin:0}
+.tools{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;font-size:13.5px;padding:12px 0 4px}
+.tools input[type=search]{min-width:0;flex:1 1 240px;font:inherit;padding:8px 10px;border:1px solid var(--line-strong);border-radius:6px;background:var(--sheet);color:var(--ink)}
+.tools label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+select{font:inherit;font-size:13.5px;padding:6px 8px;border:1px solid var(--line-strong);border-radius:6px;background:var(--sheet);color:var(--ink)}
+
+/* wiersze */
+.rows{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:7.4rem minmax(0,1fr) auto;gap:4px 16px;padding:12px 0;border-top:1px solid var(--line)}
+.rows>.row:first-child{border-top:none}
+.r-date{font:500 13px/1.4 var(--f-mono);font-variant-numeric:tabular-nums}
+.r-date small{display:block;font:400 12px/1.4 var(--f-body);color:var(--mut)}
+.r-main{min-width:0}
+.r-main a.t{font-weight:500;color:var(--ink);text-decoration-color:var(--line-strong)}
+.r-main a.t:hover{color:var(--acc);text-decoration-color:currentColor}
+.r-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.r-meta{font-size:12.5px;color:var(--mut);margin-top:3px}
+.r-meta .mono{font-size:12px}
+.r-side{text-align:right;font-size:12.5px;color:var(--mut);white-space:nowrap}
+.r-side .lbl{margin-bottom:2px}
+.r-side b{display:block;font:500 13px/1.35 var(--f-mono);color:var(--ink)}
+.month{font:600 12px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink);margin:18px 0 0;padding-bottom:6px;border-bottom:1.5px solid var(--ink)}
+.month:first-child{margin-top:10px}
+.row.w{grid-template-columns:minmax(0,1fr) 11rem 6rem 8.5rem 8.5rem}
+.row.w .r-col{min-width:0;font-size:13px}
+.row.w .r-col b{font:500 13px/1.35 var(--f-mono)}
+.row.w .r-col small{display:block;color:var(--mut);font-size:12px}
+@media (max-width:820px){
+  .row.w{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .row.w .r-main{grid-column:1/-1}
+}
+@media (max-width:640px){
+  .row{grid-template-columns:minmax(0,1fr)}
+  .r-side{text-align:left;white-space:normal}
+}
+
+/* znaczniki */
+.tag{display:inline-flex;align-items:center;font:600 11px/1 var(--f-body);letter-spacing:.02em;padding:4px 7px;border-radius:4px;white-space:nowrap}
+.tag.hi{background:var(--hi-soft);color:var(--hi)}
+.tag.mid{background:var(--mid-soft);color:var(--mid)}
+.tag.lo{background:var(--lo-soft);color:var(--lo)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.kind{background:var(--kind-bg);color:var(--kind-ink)}
+.tag.new{background:var(--new);color:var(--new-ink);letter-spacing:.06em}
+
+details summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:14px;padding:12px 0 4px}
+.links{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;padding:14px 0 4px}
+.links a{display:block;border:1px solid var(--line);padding:12px 14px;text-decoration:none;min-width:0;background:var(--sheet)}
+.links a:hover{border-color:var(--line-strong)}
+.links b{color:var(--ink);font-weight:600}
+.links span{display:block;font-size:12.5px;color:var(--mut);margin-top:3px}
+.alert{border:1px solid var(--hi);background:var(--hi-soft);padding:12px 16px;margin:0 0 18px;font-size:14px}
+.alert b{color:var(--hi)}
+.alert ul{margin:6px 0 0;padding-left:18px}
+footer{color:var(--mut);font-size:12.5px;padding-block:0 32px}
+footer p{margin:0 0 6px;max-width:90ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="tb">
+  <div class="wrap">
+    <div class="tb-grid">
+      <div class="tb-name">
+        <span class="lbl" data-i18n="sheetLbl"></span>
+        <h1 data-i18n="appName">Prawo planu</h1>
+        <p data-i18n="tagline"></p>
+      </div>
+      <div class="tb-cell"><span class="lbl" data-i18n="asof"></span><b id="asof">—</b></div>
+      <div class="tb-cell"><span class="lbl" data-i18n="source"></span><b>api.sejm.gov.pl</b></div>
+      <div class="tb-cell"><span class="lbl" data-i18n="lastVisit"></span><b id="lastvisit">—</b></div>
+      <div class="tb-act">
+        <div class="lang" role="group" aria-label="Język / Language">
+          <button type="button" data-lang="pl" aria-pressed="true">PL</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <button class="btn" id="refresh" type="button" data-i18n="refresh"></button>
+      </div>
+    </div>
+    <div class="status" role="status" aria-live="polite">
+      <span class="bar" id="barwrap"><i id="bar"></i></span>
+      <span id="status-text"></span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sekcje">
+  <div class="wrap">
+    <a href="#nowosci"><b data-i18n="nav.news"></b><span id="n-news"></span></a>
+    <a href="#kalendarz"><b data-i18n="nav.cal"></b><span id="n-cal"></span></a>
+    <a href="#obserwowane"><b data-i18n="nav.watch"></b><span id="n-watch"></span></a>
+    <a href="#sejm"><b data-i18n="nav.sejm"></b><span id="n-sejm"></span></a>
+    <a href="#dziennik"><b data-i18n="nav.du"></b><span id="n-du"></span></a>
+    <a href="#zrodla"><b data-i18n="nav.links"></b></a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div id="errors"></div>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="sheet" id="nowosci">
+    <div class="sheet-h">
+      <div>
+        <h2 data-i18n="newsTitle"></h2>
+        <p data-i18n="newsSub"></p>
+      </div>
+      <label><span data-i18n="period"></span> <select id="win">
+        <option value="7">7</option><option value="14">14</option><option value="30" selected>30</option><option value="90">90</option>
+      </select></label>
+    </div>
+    <div class="sheet-b" id="news"><p class="empty" data-i18n="loadingShort"></p></div>
+  </section>
+
+  <section class="sheet" id="kalendarz">
+    <div class="sheet-h"><div>
+      <h2 data-i18n="calTitle"></h2>
+      <p data-i18n="calSub"></p>
+    </div></div>
+    <div class="sheet-b" id="cal"><p class="empty" data-i18n="loadingShort"></p></div>
+  </section>
+
+  <section class="sheet" id="obserwowane">
+    <div class="sheet-h"><div>
+      <h2 data-i18n="watchTitle"></h2>
+      <p data-i18n="watchSub"></p>
+    </div></div>
+    <div class="sheet-b" id="watch"><p class="empty" data-i18n="loadingShort"></p></div>
+  </section>
+
+  <section class="sheet" id="sejm">
+    <div class="sheet-h"><div>
+      <h2 data-i18n="sejmTitle"></h2>
+      <p id="sejm-sub"></p>
+    </div></div>
+    <div class="sheet-b" id="sejm-list"><p class="empty" data-i18n="loadingShort"></p></div>
+  </section>
+
+  <section class="sheet" id="dziennik">
+    <div class="sheet-h"><div>
+      <h2 data-i18n="duTitle"></h2>
+      <p data-i18n="duSub"></p>
+    </div></div>
+    <div class="sheet-b">
+      <div class="tools">
+        <input type="search" id="q" data-i18n-ph="filter" aria-label="Filtr">
+        <label><input type="checkbox" id="low"> <span data-i18n="showLow"></span></label>
+      </div>
+      <div id="du"><p class="empty" data-i18n="loadingShort"></p></div>
+    </div>
+  </section>
+
+  <section class="sheet" id="zrodla">
+    <div class="sheet-h"><div>
+      <h2 data-i18n="linksTitle"></h2>
+      <p data-i18n="linksSub"></p>
+    </div></div>
+    <div class="sheet-b"><div class="links" id="links"></div></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p data-i18n="footer1"></p>
+  <p data-i18n="footer2"></p>
+</footer>
+
+<script>
+(() => {
+'use strict';
+
+/* ============ KONFIGURACJA ============ */
+const CONFIG = {
+  lookbackDays: 365,
+  calendarDays: 365,
+  newBadgeDays: 3,
+  keywords: [
+    'budowlane prawo', 'budownictwo', 'budownictwo mieszkaniowe', 'planowanie przestrzenne',
+    'urbanistyka i architektura', 'zabytki', 'przeciwpożarowa ochrona', 'nadzór techniczno-budowlany',
+    'roboty budowlane', 'budowlane materiały'
+  ],
+  titlePhrases: [
+    'budowlan', 'budynk', 'zagospodarowaniu przestrzennym', 'planu ogólnego', 'warunkach zabudowy',
+    'charakterystyki energetycznej', 'charakterystyce energetycznej', 'zabytk', 'architekt',
+    'zapewnianiu dostępności', 'przeciwpożarow', 'urbanist'
+  ],
+  high: [
+    /Prawo budowlane/iu, /jakim powinny odpowiadać budynki/iu, /projektu budowlanego/iu,
+    /planowaniu i zagospodarowaniu/iu, /plan\p{L}* ogóln/iu, /warunk\p{L}* zabudowy/iu,
+    /charakterystyk\p{L}* energetyczn/iu, /ochronie zabytków|opiece nad zabytkami/iu,
+    /samorząd\p{L}* zawodow\p{L}* architektów/iu, /zapewnianiu dostępności/iu,
+    /ochrony przeciwpożarowej budynków/iu, /dziennika budowy|książki obiektu/iu,
+    /zgłoszeni\p{L}* budowy|pozwoleni\p{L}* na budowę/iu, /uprawnie\p{L}* budowlan/iu,
+    /standard\p{L}* urbanistyczn/iu, /wyrob\p{L}* budowlan/iu, /dokumentacji projektowej/iu,
+    /rewitalizacj/iu, /inwestycji mieszkaniowych/iu
+  ],
+  low: [
+    /kolejow/iu, /telekomunikac/iu, /tablic rejestracyjn/iu, /wyścigow/iu, /lotnicz|lotnisk/iu,
+    /górnicz|kopal/iu, /hydrotechniczn/iu, /morsk|statk/iu, /wojskow/iu, /strażak|funkcjonariusz/iu,
+    /dodatk\p{L}* mieszkaniow/iu
+  ],
+  watched: [
+    { eli: 'DU/1994/414',  pl: 'Prawo budowlane', en: 'Construction Law' },
+    { eli: 'DU/2002/690',  pl: 'Warunki techniczne (WT 2002)', en: 'Technical Conditions for Buildings (WT 2002)' },
+    { eli: 'DU/2003/717',  pl: 'Ustawa o planowaniu i zagospodarowaniu przestrzennym', en: 'Spatial Planning and Development Act' },
+    { eli: 'DU/2020/1609', pl: 'Rozporządzenie o zakresie i formie projektu budowlanego', en: 'Regulation on the scope and form of building designs' },
+    { eli: 'DU/2001/42',   pl: 'Ustawa o samorządach zawodowych architektów i inżynierów', en: 'Act on professional chambers of architects and engineers' },
+    { eli: 'DU/2003/1568', pl: 'Ustawa o ochronie zabytków', en: 'Monument Protection Act' },
+    { eli: 'DU/2019/1696', pl: 'Ustawa o zapewnianiu dostępności', en: 'Accessibility Act' },
+    { eli: 'DU/2014/1200', pl: 'Ustawa o charakterystyce energetycznej budynków', en: 'Energy Performance of Buildings Act' },
+    { eli: 'DU/2015/376',  pl: 'Rozporządzenie o metodologii charakterystyki energetycznej', en: 'Regulation on energy performance methodology' },
+    { eli: 'DU/2010/719',  pl: 'Rozporządzenie o ochronie przeciwpożarowej budynków', en: 'Regulation on fire protection of buildings' },
+    { eli: 'DU/2004/881',  pl: 'Ustawa o wyrobach budowlanych', en: 'Construction Products Act' },
+    { eli: 'DU/2021/2454', pl: 'Rozporządzenie o dokumentacji projektowej (zamówienia publiczne)', en: 'Regulation on design documentation (public procurement)' }
+  ],
+  sejmPhrases: [
+    'Prawo budowlane', 'planowaniu i zagospodarowaniu przestrzennym', 'ochronie zabytków',
+    'charakterystyce energetycznej', 'samorządach zawodowych architektów', 'wyrobach budowlanych',
+    'zapewnianiu dostępności', 'inwestycji mieszkaniowych', 'rewitalizacji', 'budownictw'
+  ],
+  terms: [
+    { date: '2026-12-31', url: 'https://eur-lex.europa.eu/eli/dir/2024/1275/oj',
+      pl: 'EPBD: instalacje solarne na nowych budynkach publicznych i niemieszkalnych powyżej 250 m² (termin z dyrektywy, zależy od wdrożenia w Polsce)',
+      en: 'EPBD: solar installations on new public and non-residential buildings over 250 m² (directive deadline; depends on Polish transposition)' },
+    { date: '2028-01-01', url: 'https://eur-lex.europa.eu/eli/dir/2024/1275/oj',
+      pl: 'EPBD: nowe budynki publiczne zeroemisyjne', en: 'EPBD: new public buildings must be zero-emission' },
+    { date: '2029-12-31', url: 'https://eur-lex.europa.eu/eli/dir/2024/1275/oj',
+      pl: 'EPBD: instalacje solarne na wszystkich nowych budynkach mieszkalnych (termin z dyrektywy)', en: 'EPBD: solar installations on all new residential buildings (directive deadline)' },
+    { date: '2030-01-01', url: 'https://eur-lex.europa.eu/eli/dir/2024/1275/oj',
+      pl: 'EPBD: wszystkie nowe budynki zeroemisyjne', en: 'EPBD: all new buildings must be zero-emission' }
+  ],
+  links: [
+    { url: 'https://legislacja.gov.pl/', pl: ['RCL – projekty rozporządzeń', 'Prawo w przygotowaniu, m.in. nowe Warunki Techniczne.'], en: ['RCL – draft regulations', 'Upcoming law, including the new Technical Conditions (WT).'] },
+    { url: 'https://isap.sejm.gov.pl/', pl: ['ISAP – teksty aktów', 'Teksty jednolite i PDF-y aktów prawnych.'], en: ['ISAP – legal texts', 'Consolidated texts and PDFs of Polish legal acts.'] },
+    { url: 'https://www.gunb.gov.pl/', pl: ['GUNB', 'Komunikaty nadzoru budowlanego, e-Budownictwo, c-KOB.'], en: ['GUNB – Building Control Office', 'Announcements, e-Budownictwo, digital building logbook (c-KOB).'] },
+    { url: 'https://www.gov.pl/web/rozwoj-technologia', pl: ['Ministerstwo Rozwoju i Technologii', 'Konsultacje WT i EPBD. Część rozporządzeń budowlanych w 2026 r. wydaje Minister Finansów i Gospodarki.'], en: ['Ministry of Development and Technology', 'Consultations on WT and EPBD. Some 2026 building regulations are issued by the Minister of Finance and Economy.'] },
+    { url: 'https://www.izbaarchitektow.pl/', pl: ['Izba Architektów RP', 'Stanowiska izby, szkolenia, doskonalenie zawodowe.'], en: ['Chamber of Architects of Poland', 'Official positions, training, professional development.'] },
+    { url: 'https://www.sarp.org.pl/', pl: ['SARP', 'Konkursy architektoniczne i wydarzenia.'], en: ['SARP – Association of Polish Architects', 'Architectural competitions and events.'] },
+    { url: 'https://www.pkn.pl/', pl: ['PKN – Polski Komitet Normalizacyjny', 'Nowe i wycofane Polskie Normy, Eurokody.'], en: ['PKN – Polish Committee for Standardization', 'New and withdrawn Polish Standards, Eurocodes.'] },
+    { url: 'https://eur-lex.europa.eu/eli/dir/2024/1275/oj', pl: ['EUR-Lex – EPBD 2024/1275', 'Dyrektywa o charakterystyce energetycznej budynków.'], en: ['EUR-Lex – EPBD 2024/1275', 'Energy Performance of Buildings Directive.'] },
+    { url: 'https://eur-lex.europa.eu/eli/reg/2024/3110/oj', pl: ['EUR-Lex – CPR 2024/3110', 'Rozporządzenie UE o wyrobach budowlanych.'], en: ['EUR-Lex – CPR 2024/3110', 'EU Construction Products Regulation.'] },
+    { url: 'https://inzynierbudownictwa.pl/', pl: ['Inżynier Budownictwa', 'Komentarze ekspertów do zmian w przepisach.'], en: ['Inżynier Budownictwa (magazine)', 'Expert commentary on regulatory changes (Polish).'] }
+  ]
+};
+
+/* ============ TEKSTY PL / EN ============ */
+const I18N = {
+  pl: {
+    appName: 'Prawo planu', sheetLbl: 'Arkusz · prawo budowlane RP',
+    tagline: 'Zmiany w prawie budowlanym i planistycznym, pobierane na żywo z Dziennika Ustaw i Sejmu.',
+    asof: 'Stan na', source: 'Źródło', lastVisit: 'Poprzednia wizyta', firstVisit: 'pierwsza', refresh: 'Odśwież',
+    loading: 'Pobieram dane z API Sejmu…', loadingShort: 'Ładowanie…', updated: 'Zaktualizowano', requests: 'zapytań',
+    firstNote: 'pierwsza wizyta: od następnej strona pokaże, co się zmieniło', problems: 'problemy',
+    failed: 'Nie udało się pobrać danych', failedHint: 'Sprawdź połączenie i kliknij „Odśwież”.',
+    nav: { news: 'Nowości', cal: 'Kalendarz', watch: 'Obserwowane akty', sejm: 'Projekty w Sejmie', du: 'Dziennik Ustaw', links: 'Źródła' },
+    stats: ['nowe od poprzedniej wizyty', 'zmiany z ostatnich {n} dni', 'wchodzi w życie w 90 dni', 'projektów ustaw w toku', 'obserwowanych aktów'],
+    newsTitle: 'Nowości',
+    newsSub: 'Nowe akty w Dzienniku Ustaw, nowelizacje obserwowanych aktów i ruch w Sejmie. Znacznik „NOWE” oznacza rzeczy, których nie było przy Twojej poprzedniej wizycie.',
+    period: 'Okres:', daysOpt: '{n} dni', newsEmpty: 'W ciągu ostatnich {n} dni nic się nie zmieniło. Wybierz dłuższy okres.',
+    calTitle: 'Kalendarz – co wchodzi w życie',
+    calSub: 'Daty wejścia w życie aktów z Dziennika Ustaw, zaplanowane nowelizacje obserwowanych aktów i terminy z dyrektywy EPBD.',
+    calEmpty: 'Nic nie jest zaplanowane.',
+    watchTitle: 'Obserwowane akty',
+    watchSub: 'Najważniejsze akty dla architekta. Strona sprawdza ich nowelizacje, akty wykonawcze, teksty jednolite i uchylenia.',
+    watchFail: 'Nie udało się pobrać danych tego aktu.',
+    sejmTitle: 'Projekty ustaw w Sejmie',
+    sejmSub: 'Prawo w przygotowaniu{term}. Projekty rozporządzeń (np. nowe Warunki Techniczne) publikuje RCL – link w sekcji Źródła.',
+    sejmTerm: ', Sejm {n}. kadencji', sejmEmpty: 'Brak projektów w toku pasujących do filtrów.', sejmDone: 'Zakończone w ostatnim roku',
+    duTitle: 'Dziennik Ustaw – ostatnie 12 miesięcy',
+    duSub: 'Akty pasujące do słów kluczowych budownictwa, planowania, zabytków, ppoż. i charakterystyki energetycznej.',
+    filter: 'Filtruj, np. warunki techniczne, zabytki, ppoż.', showLow: 'pokaż poboczne',
+    duNone: 'Brak aktów pasujących do filtra.', duEmpty: 'Brak aktów.',
+    linksTitle: 'Źródła do ręcznego przeglądu', linksSub: 'Te serwisy nie udostępniają danych automatom. Warto zajrzeć raz w tygodniu.',
+    footer1: 'Dane pobierane w Twojej przeglądarce z otwartego API Sejmu RP (ELI, procesy legislacyjne) przy każdym otwarciu strony. „Nowe od poprzedniej wizyty” zapamiętuje tylko ta przeglądarka.',
+    footer2: 'Strona ma charakter informacyjny i nie jest poradą prawną. Przed zastosowaniem przepisu sprawdź tekst aktu w ISAP.',
+    errTitle: 'Część danych nie została pobrana.', errHint: 'Wyniki mogą być niepełne – spróbuj „Odśwież” za chwilę.',
+    errSearch: 'Wyszukiwanie w Dzienniku Ustaw', errWatch: 'Obserwowany akt', errTerm: 'Lista kadencji Sejmu', errSejm: 'Sejm – projekty',
+    prio: { wysoki: 'ważne', sredni: 'do wglądu', niski: 'poboczne' }, isNew: 'NOWE',
+    kinds: { inForce: 'nowelizacja weszła w życie', planned: 'nowelizacja zaplanowana', exec: 'nowy akt wykonawczy', consolidated: 'tekst jednolity', repeal: 'uchylenie' },
+    lbl: { entry: 'wchodzi w życie', lastChange: 'ostatnia zmiana', published: 'opublikowano', promulgated: 'ogłoszono', inForceFrom: 'wejście w życie',
+           status: 'Status', amendments: 'Nowelizacji', lastAmend: 'Ostatnia zmiana', scheduled: 'Zaplanowane', none: 'brak',
+           print: 'druk nr', submitted: 'wpłynął', amends: 'zmienia', journal: 'Dziennik Ustaw', dzu: 'Dz.U.', sejm: 'Sejm' },
+    today: 'dziś', tomorrow: 'jutro', yesterday: 'wczoraj', inDays: 'za {n} dni', daysAgo: '{n} dni temu',
+    months: ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'],
+    locale: 'pl-PL'
+  },
+  en: {
+    appName: 'Law Plan', sheetLbl: 'Sheet · Polish building law',
+    tagline: 'Changes in Polish building and planning law, fetched live from the Journal of Laws and the Sejm.',
+    asof: 'Updated', source: 'Source', lastVisit: 'Previous visit', firstVisit: 'first', refresh: 'Refresh',
+    loading: 'Fetching data from the Sejm API…', loadingShort: 'Loading…', updated: 'Updated', requests: 'requests',
+    firstNote: 'first visit: from your next visit the page will show what changed', problems: 'problems',
+    failed: 'Could not fetch the data', failedHint: 'Check your connection and click “Refresh”.',
+    nav: { news: 'What’s new', cal: 'Calendar', watch: 'Watched acts', sejm: 'Bills in the Sejm', du: 'Journal of Laws', links: 'Sources' },
+    stats: ['new since your previous visit', 'changes in the last {n} days', 'entering into force within 90 days', 'bills in progress', 'watched acts'],
+    newsTitle: 'What’s new',
+    newsSub: 'New acts in the Journal of Laws, amendments to watched acts and activity in the Sejm. “NEW” marks items that were not there on your previous visit.',
+    period: 'Period:', daysOpt: '{n} days', newsEmpty: 'Nothing changed in the last {n} days. Pick a longer period.',
+    calTitle: 'Calendar – what enters into force',
+    calSub: 'Entry-into-force dates of acts from the Journal of Laws, scheduled amendments to watched acts and EPBD deadlines.',
+    calEmpty: 'Nothing is scheduled.',
+    watchTitle: 'Watched acts',
+    watchSub: 'The key acts for architects. The page checks their amendments, implementing acts, consolidated texts and repeals.',
+    watchFail: 'Could not fetch this act.',
+    sejmTitle: 'Bills in the Sejm',
+    sejmSub: 'Law in the making{term}. Draft regulations (e.g. the new Technical Conditions) are published by RCL – see Sources.',
+    sejmTerm: ', {n}th term of the Sejm', sejmEmpty: 'No bills in progress match the filters.', sejmDone: 'Closed in the last year',
+    duTitle: 'Journal of Laws – last 12 months',
+    duSub: 'Acts matching keywords for construction, planning, monuments, fire safety and energy performance. Act titles are shown in Polish, as published.',
+    filter: 'Filter, e.g. warunki techniczne, zabytki, ppoż.', showLow: 'show minor',
+    duNone: 'No acts match the filter.', duEmpty: 'No acts.',
+    linksTitle: 'Sources to check by hand', linksSub: 'These services do not offer data to automated tools. Worth a look once a week.',
+    footer1: 'Data is fetched in your browser from the open API of the Polish Sejm (ELI, legislative processes) each time you open the page. “New since your previous visit” is remembered by this browser only. Legal act titles are in Polish.',
+    footer2: 'For information only, not legal advice. Check the act’s text in ISAP before relying on it.',
+    errTitle: 'Some data could not be fetched.', errHint: 'Results may be incomplete – try “Refresh” in a moment.',
+    errSearch: 'Journal of Laws search', errWatch: 'Watched act', errTerm: 'Sejm terms list', errSejm: 'Sejm bills',
+    prio: { wysoki: 'important', sredni: 'for review', niski: 'minor' }, isNew: 'NEW',
+    kinds: { inForce: 'amendment in force', planned: 'amendment scheduled', exec: 'new implementing act', consolidated: 'consolidated text', repeal: 'repeal' },
+    lbl: { entry: 'enters into force', lastChange: 'last change', published: 'published', promulgated: 'published', inForceFrom: 'in force from',
+           status: 'Status', amendments: 'Amendments', lastAmend: 'Last amendment', scheduled: 'Scheduled', none: 'none',
+           print: 'print no.', submitted: 'submitted', amends: 'amends', journal: 'Journal of Laws', dzu: 'Journal of Laws', sejm: 'Sejm' },
+    today: 'today', tomorrow: 'tomorrow', yesterday: 'yesterday', inDays: 'in {n} days', daysAgo: '{n} days ago',
+    months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    locale: 'en-GB'
+  }
+};
+const EN_STATUS = {
+  'obowiązujący': 'in force', 'akt posiada tekst jednolity': 'consolidated text available', 'uznany za uchylony': 'deemed repealed',
+  'uchylony': 'repealed', 'wygaśnięcie aktu': 'expired', 'akt objęty tekstem jednolitym': 'covered by consolidated text',
+  'nieobowiązujący': 'not in force', 'akt jednorazowy': 'one-off act', 'w toku': 'in progress', 'uchwalony': 'passed', 'zamknięty': 'closed'
+};
+const EN_TYPE = { 'Ustawa': 'Act', 'Rozporządzenie': 'Regulation', 'Obwieszczenie': 'Announcement', 'Uchwała': 'Resolution', 'Zarządzenie': 'Order', 'Umowa międzynarodowa': 'International agreement' };
+
+/* ============ NARZĘDZIA ============ */
+const API = 'https://api.sejm.gov.pl';
+const LS_STATE = 'prawo-planu:stan:v1';
+const LS_WIN = 'prawo-planu:okres';
+const LS_LANG = 'prawo-planu:jezyk';
+const REF_TYPES = {
+  'Akty zmieniające': 'amend',
+  'Akty wykonawcze': 'exec',
+  'Inf. o tekście jednolitym': 'consolidated',
+  'Akty uchylające': 'repeal',
+  'Uchylenia wynikające z': 'repeal'
+};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const short = s => (s ? String(s).slice(0, 10) : '');
+const fill = (s, n) => String(s).replace('{n}', n);
+let TODAY = ymd(new Date());
+const addDays = n => { const d = new Date(); d.setDate(d.getDate() + n); return ymd(d); };
+const dayNum = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) / 864e5 : null; };
+const daysFromToday = s => { const a = dayNum(s); return a == null ? null : a - dayNum(TODAY); };
+const fmtDate = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? `${m[3]}.${m[2]}.${m[1]}` : ''; };
+
+let lang = 'pl';
+let T = I18N.pl;
+const fmtDateTime = ts => new Date(ts).toLocaleString(T.locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const nameOf = w => w[lang] || w.pl;
+const statusText = s => (lang === 'en' && EN_STATUS[s]) || s;
+const typeText = s => (lang === 'en' && EN_TYPE[s]) || s;
+
+function daysLabel(s) {
+  const d = daysFromToday(s);
+  if (d == null) return '';
+  if (d === 0) return T.today;
+  if (d === 1) return T.tomorrow;
+  if (d === -1) return T.yesterday;
+  return d > 0 ? fill(T.inDays, d) : fill(T.daysAgo, -d);
+}
+function isap(eli) {
+  const p = String(eli || '').split('/');
+  if (p.length < 3) return 'https://isap.sejm.gov.pl/';
+  return 'https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=' + (p[0] === 'MP' ? 'WMP' : 'WDU') + p[1] + String(p[2]).padStart(7, '0');
+}
+function displayAddr(eli) {
+  const p = String(eli || '').split('/');
+  return p.length < 3 ? String(eli || '') : `${p[0] === 'MP' ? 'M.P.' : 'Dz.U.'} ${p[1]} poz. ${p[2]}`;
+}
+function priority(title) {
+  for (const r of CONFIG.high) if (r.test(title)) return 'wysoki';
+  for (const r of CONFIG.low) if (r.test(title)) return 'niski';
+  return 'sredni';
+}
+const tagPrio = p => `<span class="tag ${p === 'wysoki' ? 'hi' : p === 'niski' ? 'lo' : 'mid'}">${esc(T.prio[p] || T.prio.sredni)}</span>`;
+const tagKind = k => `<span class="tag kind">${esc(k)}</span>`;
+const tagNew = on => on ? `<span class="tag new">${esc(T.isNew)}</span>` : '';
+function tagStatus(s) {
+  if (!s) return '';
+  let cls = 'mid';
+  if (/uchyl|wygaś|zamknięty/i.test(s)) cls = 'hi';
+  else if (/obowiązujący|tekst jednolity|uchwalony/i.test(s)) cls = 'ok';
+  return `<span class="tag ${cls}">${esc(statusText(s))}</span>`;
+}
+function loadState() { try { return JSON.parse(localStorage.getItem(LS_STATE)) || {}; } catch (e) { return {}; } }
+function saveState(s) { try { localStorage.setItem(LS_STATE, JSON.stringify(s)); } catch (e) { /* brak pamięci przeglądarki */ } }
+
+/* ============ JĘZYK ============ */
+function pickLang() {
+  const q = new URLSearchParams(location.search).get('lang');
+  if (q === 'pl' || q === 'en') return q;
+  try { const s = localStorage.getItem(LS_LANG); if (s === 'pl' || s === 'en') return s; } catch (e) { /* ignoruj */ }
+  return /^pl\b/i.test(navigator.language || 'pl') ? 'pl' : 'en';
+}
+function getKey(obj, path) { return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj); }
+function applyStatic() {
+  document.documentElement.lang = lang;
+  document.title = T.appName;
+  document.querySelectorAll('[data-i18n]').forEach(el => { const v = getKey(T, el.dataset.i18n); if (typeof v === 'string') el.textContent = v; });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = getKey(T, el.dataset.i18nPh) || ''; });
+  document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  document.querySelectorAll('#win option').forEach(o => { o.textContent = fill(T.daysOpt, o.value); });
+  $('#links').innerHTML = CONFIG.links.map(l => { const [n, d] = l[lang] || l.pl; return `<a href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(n)}</b><span>${esc(d)}</span></a>`; }).join('');
+  $('#sejm-sub').textContent = T.sejmSub.replace('{term}', model && model.term ? fill(T.sejmTerm, model.term) : '');
+  if (!model) {
+    $('#stats').innerHTML = T.stats.map(l => `<div class="stat"><b>–</b><span>${esc(fill(l, currentWindow()))}</span></div>`).join('');
+    $('#lastvisit').textContent = '—';
+  }
+}
+function setLang(l) {
+  lang = l; T = I18N[l];
+  try { localStorage.setItem(LS_LANG, l); } catch (e) { /* ignoruj */ }
+  applyStatic();
+  if (model) render(); else if (loadingNow) progress();
+}
+
+/* ============ POBIERANIE ============ */
+let reqDone = 0, reqTotal = 0, loadingNow = false;
+const queue = []; let active = 0; const LIMIT = 6;
+function progress() {
+  $('#bar').style.width = (reqTotal ? Math.round(100 * reqDone / reqTotal) : 0) + '%';
+  $('#status-text').textContent = `${T.loading} ${reqDone}/${reqTotal}`;
+}
+function limited(fn) { return new Promise((res, rej) => { queue.push({ fn, res, rej }); pump(); }); }
+function pump() {
+  while (active < LIMIT && queue.length) {
+    const { fn, res, rej } = queue.shift();
+    active++;
+    fn().then(res, rej).finally(() => { active--; pump(); });
+  }
+}
+async function getJson(path) {
+  reqTotal++; progress();
+  try {
+    return await limited(async () => {
+      for (let i = 0; ; i++) {
+        try {
+          const r = await fetch(API + path);
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return await r.json();
+        } catch (e) {
+          if (i >= 2) throw e;
+          await new Promise(ok => setTimeout(ok, 700 * (i + 1)));
+        }
+      }
+    });
+  } finally { reqDone++; progress(); }
+}
+
+async function fetchActs(errors) {
+  const dateFrom = addDays(-CONFIG.lookbackDays);
+  const acts = new Map();
+  const queries = [
+    ...CONFIG.keywords.map(k => 'keyword=' + encodeURIComponent(k)),
+    ...CONFIG.titlePhrases.map(t => 'title=' + encodeURIComponent(t))
+  ];
+  await Promise.all(queries.map(async q => {
+    try {
+      let offset = 0, total = Infinity;
+      while (offset < total && offset < 2000) {
+        const r = await getJson(`/eli/acts/search?publisher=DU&dateFrom=${dateFrom}&limit=500&offset=${offset}&${q}`);
+        const items = (r.items || []).filter(Boolean);
+        for (const it of items) if (it.ELI) acts.set(it.ELI, it);
+        total = r.totalCount != null ? r.totalCount : (r.count != null ? r.count : items.length);
+        if (!items.length) break;
+        offset += items.length;
+      }
+    } catch (e) { errors.push({ k: 'errSearch', d: decodeURIComponent(q.split('=')[1]), m: e.message }); }
+  }));
+  return [...acts.values()].map(it => ({
+    eli: it.ELI,
+    title: it.title || it.ELI,
+    display: it.displayAddress || displayAddr(it.ELI),
+    type: it.type || '',
+    status: it.status || '',
+    promulgation: short(it.promulgation),
+    entry: short(it.entryIntoForce),
+    prio: priority(it.title || '')
+  }));
+}
+
+async function fetchWatched(errors) {
+  return Promise.all(CONFIG.watched.map(async w => {
+    const out = { ...w, title: '', status: '', refs: [], ok: false };
+    try {
+      const a = await getJson('/eli/acts/' + w.eli);
+      out.ok = true; out.title = a.title || ''; out.status = a.status || '';
+      const R = a.references || {};
+      for (const [type, kind] of Object.entries(REF_TYPES)) {
+        for (const r of (R[type] || [])) {
+          if (r && r.id) out.refs.push({ type, kind, id: r.id, date: short(r.date), key: `ref|${w.eli}|${type}|${r.id}` });
+        }
+      }
+    } catch (e) { errors.push({ k: 'errWatch', d: w.pl, m: e.message }); }
+    const am = out.refs.filter(r => r.kind === 'amend');
+    out.amendCount = am.length;
+    out.past = am.filter(r => { const d = daysFromToday(r.date); return d != null && d <= 0; }).sort((a, b) => b.date.localeCompare(a.date));
+    out.future = am.filter(r => { const d = daysFromToday(r.date); return d != null && d > 0; }).sort((a, b) => a.date.localeCompare(b.date));
+    return out;
+  }));
+}
+
+async function fetchSejm(errors) {
+  let term = null;
+  try {
+    const terms = await getJson('/sejm/term');
+    const cur = terms.find(t => t.current) || terms[terms.length - 1];
+    term = cur && cur.num;
+  } catch (e) { errors.push({ k: 'errTerm', d: '', m: e.message }); return { term: null, list: [] }; }
+  const out = new Map();
+  await Promise.all(CONFIG.sejmPhrases.map(async ph => {
+    try {
+      const list = await getJson(`/sejm/term${term}/processes?title=${encodeURIComponent(ph)}`);
+      for (const p of (list || [])) {
+        if (!p || !p.number) continue;
+        if (p.documentType && !/projekt ustawy/i.test(p.documentType)) continue;
+        const key = `${term}-${p.number}`;
+        if (out.has(key)) continue;
+        out.set(key, {
+          key, number: String(p.number), title: p.title || '', desc: p.description || '',
+          start: short(p.processStartDate), change: p.changeDate || '',
+          status: p.passed ? 'uchwalony' : (p.closureDate ? 'zamknięty' : 'w toku'),
+          eli: p.ELI || '', url: `https://www.sejm.gov.pl/Sejm${term}.nsf/PrzebiegProc.xsp?nr=${p.number}`
+        });
+      }
+    } catch (e) { errors.push({ k: 'errSejm', d: ph, m: e.message }); }
+  }));
+  return { term, list: [...out.values()] };
+}
+
+/* ============ GŁÓWNY PRZEBIEG ============ */
+let model = null;
+
+async function run() {
+  const btn = $('#refresh');
+  btn.disabled = true;
+  loadingNow = true;
+  TODAY = ymd(new Date());
+  reqDone = 0; reqTotal = 0;
+  $('#barwrap').hidden = false;
+  progress();
+  const t0 = performance.now();
+  const st = loadState();
+  const prevVisit = st.lastVisit || null;
+
+  const errors = [];
+  const [acts, watched, sejm] = await Promise.all([fetchActs(errors), fetchWatched(errors), fetchSejm(errors)]);
+
+  // „NOWE” – porównanie z tym, co ta przeglądarka widziała wcześniej
+  const firstVisit = !st.seen;
+  const seen = st.seen || {};
+  const now = Date.now();
+  const present = new Set();
+  const isNew = key => {
+    present.add(key);
+    if (!(key in seen)) seen[key] = firstVisit ? 0 : now;
+    return seen[key] > 0 && (now - seen[key]) < CONFIG.newBadgeDays * 864e5;
+  };
+  acts.forEach(a => { a.isNew = isNew('akt|' + a.eli); });
+  watched.forEach(w => w.refs.forEach(r => { r.isNew = isNew(r.key); }));
+  sejm.list.forEach(p => { p.isNew = isNew(`pr|${p.key}|${p.change}`); });
+
+  // tytuły aktów zmieniających (z pamięci podręcznej albo z API)
+  const titles = Object.assign({}, st.titles || {});
+  acts.forEach(a => { titles[a.eli] = { t: a.title, d: a.display }; });
+  const need = new Set();
+  watched.forEach(w => w.refs.forEach(r => {
+    const d = daysFromToday(r.date);
+    if (r.isNew || (d != null && d >= -90 && d <= CONFIG.calendarDays)) need.add(r.id);
+  }));
+  await Promise.all([...need].filter(id => !titles[id]).map(async id => {
+    try { const a = await getJson('/eli/acts/' + id); titles[id] = { t: a.title || id, d: a.displayAddress || displayAddr(id) }; }
+    catch (e) { /* bez tytułu pokażemy sam numer */ }
+  }));
+
+  // zapis stanu tej przeglądarki
+  if (!errors.length) for (const k of Object.keys(seen)) if (!present.has(k)) delete seen[k];
+  const keepTitles = {};
+  need.forEach(id => { if (titles[id]) keepTitles[id] = titles[id]; });
+  saveState({ seen, titles: keepTitles, lastVisit: now });
+
+  model = { acts, watched, procs: sejm.list, term: sejm.term, titles, errors, at: now, prevVisit, firstVisit,
+            requests: reqTotal, ms: Math.round(performance.now() - t0) };
+  loadingNow = false;
+  applyStatic();
+  render();
+  btn.disabled = false;
+}
+
+/* ============ RENDEROWANIE ============ */
+function rowHtml({ date, sub, tags, title, url, meta, side, attrs }) {
+  return `<li class="row"${attrs || ''}>` +
+    `<div class="r-date">${esc(fmtDate(date) || '—')}${sub ? `<small>${esc(sub)}</small>` : ''}</div>` +
+    `<div class="r-main">${tags ? `<div class="r-tags">${tags}</div>` : ''}` +
+    `<a class="t" href="${esc(url)}" target="_blank" rel="noopener">${esc(title)}</a>` +
+    `${meta ? `<div class="r-meta">${meta}</div>` : ''}</div>` +
+    `${side ? `<div class="r-side">${side}</div>` : ''}</li>`;
+}
+
+function currentWindow() { return parseInt($('#win').value, 10) || 30; }
+
+function refLabel(r) {
+  if (r.kind !== 'amend') return T.kinds[r.kind] || r.kind;
+  const d = daysFromToday(r.date);
+  return (d != null && d > 0) ? T.kinds.planned : T.kinds.inForce;
+}
+
+function buildNews(m, win) {
+  const out = [];
+  for (const a of m.acts) {
+    if (a.prio === 'niski' && !a.isNew) continue;
+    const d = daysFromToday(a.promulgation);
+    if (!(a.isNew || (d != null && d >= -win && d <= 0))) continue;
+    out.push({
+      date: a.promulgation, isNew: a.isNew,
+      tags: tagNew(a.isNew) + tagKind(`${T.lbl.dzu} · ${typeText(a.type)}`) + tagPrio(a.prio),
+      title: a.title, url: isap(a.eli),
+      meta: `<span class="mono">${esc(a.display)}</span>`,
+      side: a.entry ? `<span class="lbl">${esc(T.lbl.entry)}</span><b>${esc(fmtDate(a.entry))}</b>${esc(daysLabel(a.entry))}` : ''
+    });
+  }
+  for (const w of m.watched) for (const r of w.refs) {
+    const d = daysFromToday(r.date);
+    const inWin = d != null && d >= -win && d <= 0;
+    if (!(r.isNew || inWin)) continue;
+    const t = m.titles[r.id];
+    out.push({
+      date: r.date, isNew: r.isNew,
+      tags: tagNew(r.isNew) + tagKind(refLabel(r)) + tagPrio('wysoki'),
+      title: `${nameOf(w)}: ${t ? t.t : displayAddr(r.id)}`, url: isap(r.id),
+      meta: `<span class="mono">${esc(t ? t.d : displayAddr(r.id))}</span>`,
+      side: ''
+    });
+  }
+  for (const p of m.procs) {
+    const d = daysFromToday(p.change);
+    if (!(p.isNew || (d != null && d >= -win))) continue;
+    out.push({
+      date: short(p.change), isNew: p.isNew,
+      tags: tagNew(p.isNew) + tagKind(`${T.lbl.sejm} · ${statusText(p.status)}`),
+      title: p.title, url: p.url,
+      meta: `${esc(T.lbl.print)} <span class="mono">${esc(p.number)}</span>${p.desc ? ' · ' + esc(p.desc) : ''}`,
+      side: ''
+    });
+  }
+  out.sort((a, b) => (b.isNew - a.isNew) || String(b.date).localeCompare(String(a.date)));
+  return out;
+}
+
+function buildCalendar(m) {
+  const map = new Map();
+  for (const a of m.acts) {
+    if (a.prio === 'niski') continue;
+    const d = daysFromToday(a.entry);
+    if (d != null && d >= 0 && d <= CONFIG.calendarDays) {
+      map.set(a.eli + '|' + a.entry, { date: a.entry, title: a.title, url: isap(a.eli), src: T.lbl.journal, prio: a.prio, meta: a.display });
+    }
+  }
+  for (const w of m.watched) for (const r of w.future) {
+    const d = daysFromToday(r.date);
+    if (d == null || d > CONFIG.calendarDays) continue;
+    const t = m.titles[r.id];
+    const key = r.id + '|' + r.date;
+    const prev = map.get(key);
+    const names = prev && prev.watchNames ? prev.watchNames.concat(nameOf(w)) : [nameOf(w)];
+    map.set(key, {
+      date: r.date, title: t ? t.t : displayAddr(r.id), url: isap(r.id), prio: 'wysoki',
+      src: `${T.lbl.amends}: ${names.join(', ')}`, watchNames: names, meta: t ? t.d : displayAddr(r.id)
+    });
+  }
+  for (const t of CONFIG.terms) {
+    const d = daysFromToday(t.date);
+    if (d != null && d >= 0) map.set('T|' + t.date + t.pl, { date: t.date, title: t[lang] || t.pl, url: t.url, src: (lang === 'en' ? 'EU' : 'UE') + ' – EPBD 2024/1275', prio: 'sredni', meta: '' });
+  }
+  return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function render() {
+  const m = model;
+  if (!m) return;
+  const win = currentWindow();
+  const news = buildNews(m, win);
+  const cal = buildCalendar(m);
+  const activeP = m.procs.filter(p => p.status === 'w toku').sort((a, b) => b.change.localeCompare(a.change));
+  const doneP = m.procs.filter(p => p.status !== 'w toku' && (daysFromToday(p.change) ?? -9999) >= -365).sort((a, b) => b.change.localeCompare(a.change));
+  const newCount = news.filter(n => n.isNew).length;
+  const cal90 = cal.filter(c => daysFromToday(c.date) <= 90).length;
+
+  // nagłówek i liczby
+  $('#asof').textContent = fmtDateTime(m.at);
+  $('#lastvisit').textContent = m.prevVisit ? fmtDateTime(m.prevVisit) : T.firstVisit;
+  $('#barwrap').hidden = true;
+  $('#status-text').textContent = `${T.updated} ${fmtDateTime(m.at)} · ${m.requests} ${T.requests} · ${(m.ms / 1000).toFixed(1).replace('.', lang === 'pl' ? ',' : '.')} s` +
+    (m.firstVisit ? ` · ${T.firstNote}` : '') +
+    (m.errors.length ? ` · ${T.problems}: ${m.errors.length}` : '');
+  const tiles = [newCount, news.length, cal90, activeP.length, m.watched.length];
+  $('#stats').innerHTML = tiles.map((n, i) => `<div class="stat${i === 0 && n > 0 ? ' is-new' : ''}"><b>${n}</b><span>${esc(fill(T.stats[i], win))}</span></div>`).join('');
+  $('#n-news').textContent = news.length;
+  $('#n-cal').textContent = cal.length;
+  $('#n-watch').textContent = m.watched.length;
+  $('#n-sejm').textContent = activeP.length;
+  $('#n-du').textContent = m.acts.length;
+
+  // błędy
+  $('#errors').innerHTML = m.errors.length
+    ? `<div class="alert"><b>${esc(T.errTitle)}</b> ${esc(T.errHint)}<ul>${m.errors.map(e => `<li>${esc(T[e.k] || e.k)}${e.d ? ` (${esc(e.d)})` : ''}: ${esc(e.m)}</li>`).join('')}</ul></div>`
+    : '';
+
+  // nowości
+  $('#news').innerHTML = news.length
+    ? `<ul class="rows">${news.map(n => rowHtml({ date: n.date, sub: daysLabel(n.date), tags: n.tags, title: n.title, url: n.url, meta: n.meta, side: n.side })).join('')}</ul>`
+    : `<p class="empty">${esc(fill(T.newsEmpty, win))}</p>`;
+
+  // kalendarz z podziałem na miesiące
+  if (!cal.length) {
+    $('#cal').innerHTML = `<p class="empty">${esc(T.calEmpty)}</p>`;
+  } else {
+    let html = '', month = '';
+    for (const c of cal) {
+      const mo = c.date.slice(0, 7);
+      if (mo !== month) {
+        if (month) html += '</ul>';
+        month = mo;
+        html += `<h3 class="month">${esc(T.months[+mo.slice(5, 7) - 1])} ${mo.slice(0, 4)}</h3><ul class="rows">`;
+      }
+      html += rowHtml({ date: c.date, sub: daysLabel(c.date), tags: tagPrio(c.prio), title: c.title, url: c.url,
+        meta: `${c.meta ? `<span class="mono">${esc(c.meta)}</span> · ` : ''}${esc(c.src)}` });
+    }
+    $('#cal').innerHTML = html + '</ul>';
+  }
+
+  // obserwowane akty
+  $('#watch').innerHTML = `<ul class="rows">${m.watched.map(w => {
+    const last = w.past[0];
+    const lastHtml = last
+      ? `<a href="${esc(isap(last.id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(last.date))}</b></a><small>${esc(daysLabel(last.date))}</small>`
+      : '<small>—</small>';
+    const futHtml = w.future.length
+      ? w.future.map(f => `<a href="${esc(isap(f.id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(f.date))}</b></a>`).join('') + `<small>${esc(daysLabel(w.future[0].date))}</small>`
+      : `<small>${esc(T.lbl.none)}</small>`;
+    return `<li class="row w">` +
+      `<div class="r-main"><a class="t" href="${esc(isap(w.eli))}" target="_blank" rel="noopener"><b>${esc(nameOf(w))}</b></a>` +
+      `<div class="r-meta">${esc(w.ok ? w.title : T.watchFail)}</div></div>` +
+      `<div class="r-col"><span class="lbl">${esc(T.lbl.status)}</span>${tagStatus(w.status) || '<small>—</small>'}</div>` +
+      `<div class="r-col"><span class="lbl">${esc(T.lbl.amendments)}</span><b>${w.amendCount}</b></div>` +
+      `<div class="r-col"><span class="lbl">${esc(T.lbl.lastAmend)}</span>${lastHtml}</div>` +
+      `<div class="r-col"><span class="lbl">${esc(T.lbl.scheduled)}</span>${futHtml}</div></li>`;
+  }).join('')}</ul>`;
+
+  // Sejm
+  const procRow = p => rowHtml({
+    date: short(p.change), sub: T.lbl.lastChange,
+    tags: tagNew(p.isNew) + tagStatus(p.status),
+    title: p.title, url: p.url,
+    meta: `${esc(T.lbl.print)} <span class="mono">${esc(p.number)}</span> · ${esc(T.lbl.submitted)} ${esc(fmtDate(p.start))}${p.desc ? ' · ' + esc(p.desc) : ''}`,
+    side: p.eli ? `<span class="lbl">${esc(T.lbl.published)}</span><a href="${esc(isap(p.eli))}" target="_blank" rel="noopener"><b>${esc(displayAddr(p.eli))}</b></a>` : ''
+  });
+  $('#sejm-list').innerHTML =
+    (activeP.length ? `<ul class="rows">${activeP.map(procRow).join('')}</ul>` : `<p class="empty">${esc(T.sejmEmpty)}</p>`) +
+    (doneP.length ? `<details><summary>${esc(T.sejmDone)} (${doneP.length})</summary><ul class="rows">${doneP.map(procRow).join('')}</ul></details>` : '');
+
+  // Dziennik Ustaw
+  const acts = m.acts.slice().sort((a, b) => b.promulgation.localeCompare(a.promulgation));
+  $('#du').innerHTML = acts.length
+    ? `<ul class="rows" id="du-list">${acts.map(a => rowHtml({
+        date: a.promulgation, sub: T.lbl.promulgated,
+        tags: tagNew(a.isNew) + tagPrio(a.prio) + tagStatus(a.status),
+        title: a.title, url: isap(a.eli), meta: `<span class="mono">${esc(a.display)}</span>${a.type ? ' · ' + esc(typeText(a.type)) : ''}`,
+        side: a.entry ? `<span class="lbl">${esc(T.lbl.inForceFrom)}</span><b>${esc(fmtDate(a.entry))}</b>` : '',
+        attrs: ` data-p="${esc(a.prio)}"`
+      })).join('')}</ul><p class="empty" id="du-none" hidden>${esc(T.duNone)}</p>`
+    : `<p class="empty">${esc(T.duEmpty)}</p>`;
+  filterDu();
+}
+
+function filterDu() {
+  const q = $('#q').value.trim().toLowerCase();
+  const low = $('#low').checked;
+  let shown = 0;
+  document.querySelectorAll('#du-list > .row').forEach(r => {
+    const ok = (!q || r.textContent.toLowerCase().includes(q)) && (low || r.dataset.p !== 'niski');
+    r.hidden = !ok;
+    if (ok) shown++;
+  });
+  const none = $('#du-none');
+  if (none) none.hidden = shown > 0;
+}
+
+/* ============ START ============ */
+try { const w = localStorage.getItem(LS_WIN); if (w) $('#win').value = w; } catch (e) { /* ignoruj */ }
+lang = pickLang(); T = I18N[lang];
+applyStatic();
+document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+$('#win').addEventListener('change', () => { try { localStorage.setItem(LS_WIN, $('#win').value); } catch (e) { /* ignoruj */ } render(); });
+$('#q').addEventListener('input', filterDu);
+$('#low').addEventListener('change', filterDu);
+$('#refresh').addEventListener('click', () => { run().catch(fail); });
+function fail(e) {
+  loadingNow = false;
+  $('#refresh').disabled = false;
+  $('#barwrap').hidden = true;
+  $('#status-text').textContent = `${T.failed}: ${e && e.message ? e.message : e}. ${T.failedHint}`;
+}
+run().catch(fail);
+})();
+</script>
+</body>
+</html>
