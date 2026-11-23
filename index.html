@@ -141,6 +141,22 @@ select{font:inherit;font-size:13.5px;padding:6px 8px;border:1px solid var(--line
 .tag.kind{background:var(--kind-bg);color:var(--kind-ink)}
 .tag.new{background:var(--new);color:var(--new-ink);letter-spacing:.06em}
 
+/* szybkie newsy */
+.hot{padding:14px 0 12px;border-bottom:1px solid var(--line)}
+.hot h3{font:600 12px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;margin:0 0 4px;color:var(--ink)}
+.hot p{margin:0 0 10px;color:var(--mut);font-size:12.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:500 13.5px var(--f-body);background:var(--sheet);color:var(--ink);border:1px solid var(--line-strong);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip b{font:500 11px var(--f-mono);color:var(--mut);margin-left:7px}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--mahogany);border-color:var(--mahogany);color:#FFFFFF}
+.chip[aria-pressed="true"] b{color:var(--linen)}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
+.seg button{font:500 13px var(--f-body);background:var(--sheet);color:var(--ink);border:0;border-left:1px solid var(--line-strong);padding:6px 12px;cursor:pointer}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--mahogany);color:#FFFFFF}
+.rows.news .r-meta{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px}
+.note{color:var(--mut);font-size:12.5px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line)}
 details summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:14px;padding:12px 0 4px}
 .links{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;padding:14px 0 4px}
 .links a{display:block;border:1px solid var(--line);padding:12px 14px;text-decoration:none;min-width:0;background:var(--sheet)}
@@ -186,6 +202,7 @@ footer p{margin:0 0 6px;max-width:90ch}
 <nav class="tabs" aria-label="Sekcje">
   <div class="wrap">
     <a href="#nowosci"><b data-i18n="nav.news"></b><span id="n-news"></span></a>
+    <a href="#newsy"><b data-i18n="nav.quick"></b><span id="n-quick"></span></a>
     <a href="#kalendarz"><b data-i18n="nav.cal"></b><span id="n-cal"></span></a>
     <a href="#obserwowane"><b data-i18n="nav.watch"></b><span id="n-watch"></span></a>
     <a href="#sejm"><b data-i18n="nav.sejm"></b><span id="n-sejm"></span></a>
@@ -210,6 +227,22 @@ footer p{margin:0 0 6px;max-width:90ch}
       </select></label>
     </div>
     <div class="sheet-b" id="news"><p class="empty" data-i18n="loadingShort"></p></div>
+  </section>
+
+  <section class="sheet" id="s-newsy" data-tab="newsy" hidden>
+    <div class="sheet-h"><div>
+      <h2 data-i18n="quickTitle"></h2>
+      <p id="quick-sub"></p>
+    </div></div>
+    <div class="sheet-b">
+      <div class="hot" id="hot"></div>
+      <div class="tools">
+        <div class="seg" id="q-region" role="group" aria-label="Region"></div>
+        <div class="seg" id="q-range" role="group" aria-label="Okres"></div>
+      </div>
+      <div id="quick"><p class="empty" data-i18n="loadingShort"></p></div>
+      <p class="note" data-i18n="newsNote"></p>
+    </div>
   </section>
 
   <section class="sheet" id="s-kalendarz" data-tab="kalendarz" hidden>
@@ -352,7 +385,18 @@ const I18N = {
     loading: 'Pobieram dane z API Sejmu…', loadingShort: 'Ładowanie…', updated: 'Zaktualizowano', requests: 'zapytań',
     firstNote: 'pierwsza wizyta: od następnej strona pokaże, co się zmieniło', problems: 'problemy',
     failed: 'Nie udało się pobrać danych', failedHint: 'Sprawdź połączenie i kliknij „Odśwież”.',
-    nav: { news: 'Nowości', cal: 'Kalendarz', watch: 'Obserwowane akty', sejm: 'Projekty w Sejmie', du: 'Dziennik Ustaw', links: 'Źródła' },
+    nav: { news: 'Nowości', quick: 'Szybkie newsy', cal: 'Kalendarz', watch: 'Obserwowane akty', sejm: 'Projekty w Sejmie', du: 'Dziennik Ustaw', links: 'Źródła' },
+    quickTitle: 'Szybkie newsy',
+    quickSub: 'Najświeższe wiadomości z architektury i budownictwa z całego świata, odświeżane automatycznie co 3 godziny.',
+    newsUpdated: 'Ostatnia aktualizacja: {n}, działające źródła: {s}.',
+    hotTitle: 'Gorące tematy dnia',
+    hotHint: 'Tematy, o których w ostatnich 24 godzinach pisze naraz kilka redakcji (liczba = ile redakcji). Kliknij, żeby zobaczyć artykuły.',
+    hotNone: 'Dziś nie ma tematu, który powtarzałby się w kilku redakcjach.',
+    hotTag: 'gorący temat', qAll: 'Wszystkie', qWorld: 'Świat', qPoland: 'Polska', q24: '24 h', q3: '3 dni', q7: '7 dni',
+    newsEmpty: 'Brak newsów w wybranym zakresie.',
+    newsMissing: 'Newsy pojawią się po pierwszym uruchomieniu automatu na GitHubie (zakładka Actions). Odśwież stronę za kilka minut.',
+    viaGN: 'przez Google News', justNow: 'przed chwilą', minAgo: '{n} min temu', hAgo: '{n} godz. temu',
+    newsNote: 'Źródła: ArchDaily, Dezeen, designboom, Global Construction Review, Construction Dive, Inżynier Budownictwa oraz Google News (świat i Polska). Pokazujemy tytuły i krótkie zajawki z kanałów RSS – całe artykuły czytasz u źródła.',
     stats: ['nowe od poprzedniej wizyty', 'zmiany z ostatnich {n} dni', 'wchodzi w życie w 90 dni', 'projektów ustaw w toku', 'obserwowanych aktów'],
     newsTitle: 'Nowości',
     newsSub: 'Nowe akty w Dzienniku Ustaw, nowelizacje obserwowanych aktów i ruch w Sejmie. Znacznik „NOWE” oznacza rzeczy, których nie było przy Twojej poprzedniej wizycie.',
@@ -392,7 +436,18 @@ const I18N = {
     loading: 'Fetching data from the Sejm API…', loadingShort: 'Loading…', updated: 'Updated', requests: 'requests',
     firstNote: 'first visit: from your next visit the page will show what changed', problems: 'problems',
     failed: 'Could not fetch the data', failedHint: 'Check your connection and click “Refresh”.',
-    nav: { news: 'What’s new', cal: 'Calendar', watch: 'Watched acts', sejm: 'Bills in the Sejm', du: 'Journal of Laws', links: 'Sources' },
+    nav: { news: 'What’s new', quick: 'Quick news', cal: 'Calendar', watch: 'Watched acts', sejm: 'Bills in the Sejm', du: 'Journal of Laws', links: 'Sources' },
+    quickTitle: 'Quick news',
+    quickSub: 'The latest architecture and construction news from around the world, refreshed automatically every 3 hours.',
+    newsUpdated: 'Last update: {n}, sources working: {s}.',
+    hotTitle: 'Today’s hot topics',
+    hotHint: 'Topics covered by several newsrooms at once in the last 24 hours (number = how many newsrooms). Click one to see the articles.',
+    hotNone: 'No topic is shared by several newsrooms today.',
+    hotTag: 'hot topic', qAll: 'All', qWorld: 'World', qPoland: 'Poland', q24: '24 h', q3: '3 days', q7: '7 days',
+    newsEmpty: 'No news in the selected range.',
+    newsMissing: 'News will appear after the first run of the GitHub automation (Actions tab). Refresh the page in a few minutes.',
+    viaGN: 'via Google News', justNow: 'just now', minAgo: '{n} min ago', hAgo: '{n} h ago',
+    newsNote: 'Sources: ArchDaily, Dezeen, designboom, Global Construction Review, Construction Dive, Inżynier Budownictwa and Google News (world and Poland). We show headlines and short excerpts from RSS feeds – read full articles at the source.',
     stats: ['new since your previous visit', 'changes in the last {n} days', 'entering into force within 90 days', 'bills in progress', 'watched acts'],
     newsTitle: 'What’s new',
     newsSub: 'New acts in the Journal of Laws, amendments to watched acts and activity in the Sejm. “NEW” marks items that were not there on your previous visit.',
@@ -438,7 +493,7 @@ const API = 'https://api.sejm.gov.pl';
 const LS_STATE = 'prawo-planu:stan:v1';
 const LS_WIN = 'prawo-planu:okres';
 const LS_LANG = 'prawo-planu:jezyk';
-const TABS = ['nowosci', 'kalendarz', 'obserwowane', 'sejm', 'dziennik', 'zrodla'];
+const TABS = ['nowosci', 'newsy', 'kalendarz', 'obserwowane', 'sejm', 'dziennik', 'zrodla'];
 const STAT_TABS = ['nowosci', 'nowosci', 'kalendarz', 'sejm', 'obserwowane'];
 const REF_TYPES = {
   'Akty zmieniające': 'amend',
@@ -545,6 +600,7 @@ function setLang(l) {
   try { localStorage.setItem(LS_LANG, l); } catch (e) { /* ignoruj */ }
   applyStatic();
   if (model) render(); else if (loadingNow) progress();
+  renderNews();
 }
 
 /* ============ POBIERANIE ============ */
@@ -925,6 +981,136 @@ function filterDu() {
   if (none) none.hidden = shown > 0;
 }
 
+/* ============ SZYBKIE NEWSY ============ */
+// news.json przygotowuje automat GitHub Actions (scripts/newsy.ps1) co 3 godziny.
+const NEWS_STOP = new Set((
+  'the a an and or of to in on for with at by from as is are was were be been being it its this that these those how why what who whom which ' +
+  'new into over after before about than more most up out not no but you your we our their they them he she his her has have had will can could ' +
+  'would should may might just also all any some one two three four five first last year years day days week weeks news says said report reports ' +
+  'video photos photo via vs amid make makes made get gets inside look looks here there now today set sets take takes plans unveils unveiled ' +
+  'opens open opened launch launches reveals revealed completes completed features featuring around across between under during through ' +
+  'announces announced announce wins win won approved approves begins start starts end ends ahead behind against without within among next latest ' +
+  'top best big million billion part ways way still back off why who ' +
+  'architecture architectural architect architects design designed designs designer designers building buildings build builds built construction ' +
+  'house houses home homes project projects studio studios office offices world first-ever ' +
+  'i w we z ze na do o od po za przez dla jak co to ten ta te tym tej tego jest są był była było być się nie tak czy oraz a ale lub już też jako przy ' +
+  'pod nad między który która które których którzy roku rok lat nowy nowa nowe nowych nowego dziś teraz będzie może można jego jej ich ma mają czyli ' +
+  'tylko bardzo architektura architektury architekt architekci architektów budownictwo budownictwa budowa budowy budynek budynki budynków budynku ' +
+  'projekt projektu dom domy domu inwestycja inwestycji polsce polska polski polskie koniec końca początek sprawie kolejny kolejne czas ponad ' +
+  'około mln mld proc wraz trzeba jakie jaki gdzie kiedy dlaczego sposób będą został została zostały mamy oni ona ono one nas nam ' +
+  'city cities town red window'
+).split(/\s+/));
+let NEWS = null;
+const newsState = { region: 'all', range: 1, term: '' };
+
+function relTime(ts) {
+  const m = Math.round((Date.now() - ts) / 6e4);
+  if (m < 1) return T.justNow;
+  if (m < 60) return fill(T.minAgo, m);
+  const h = Math.floor(m / 60);
+  if (h < 24) return fill(T.hAgo, h);
+  const d = Math.floor(h / 24);
+  return d === 1 ? T.yesterday : fill(T.daysAgo, d);
+}
+// Zwraca słowa i dwuwyrazowe frazy z tytułu oraz te, które wyglądają na nazwy własne
+// (wielka litera w środku zdania albo skrótowiec). Tytuły pisane Wielkimi Literami (styl angielski) nie liczą się jako nazwy własne.
+function newsTerms(title) {
+  const words = (String(title).match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || []).map(t => t.replace(/['’]s$/, ''));
+  const titleCase = words.filter(w => /^\p{Lu}/u.test(w)).length / Math.max(1, words.length) > 0.6;
+  const tk = words.map(w => w.toLowerCase());
+  const ok = t => t.length >= 3 && !NEWS_STOP.has(t) && !/^[\d-]+$/.test(t);
+  const terms = new Set(), proper = new Set();
+  tk.forEach((t, i) => {
+    if (!ok(t)) return;
+    terms.add(t);
+    const w = words[i];
+    if ((/^\p{Lu}{3,}$/u.test(w)) || (i > 0 && !titleCase && /^\p{Lu}/u.test(w))) proper.add(t);
+    if (i + 1 < tk.length && ok(tk[i + 1])) terms.add(t + ' ' + tk[i + 1]);
+  });
+  return { terms, proper };
+}
+const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function hotTopics(items) {
+  const map = new Map();
+  for (const it of items) for (const k of it.terms) {
+    let e = map.get(k);
+    if (!e) map.set(k, e = { key: k, outlets: new Set(), n: 0, proper: 0, sample: it.title });
+    e.outlets.add(it.outlet.toLowerCase()); e.n++;
+    if (it.proper.has(k)) e.proper++;
+  }
+  // fraza: min. 2 redakcje; nazwa własna: min. 2 redakcje; zwykłe słowo: min. 3 redakcje
+  const isPhrase = e => e.key.includes(' ');
+  const cand = [...map.values()].filter(e => isPhrase(e) ? e.outlets.size >= 2 : (e.outlets.size >= 3 || (e.outlets.size >= 2 && e.proper >= 2 && e.key.length >= 4)));
+  const score = e => e.outlets.size + (isPhrase(e) ? 1 : 0) + (e.proper > 0 ? 0.5 : 0);
+  cand.sort((a, b) => (score(b) - score(a)) || (b.n - a.n));
+  const picked = [];
+  for (const e of cand) {
+    if (picked.length >= 8) break;
+    const words = e.key.split(' ');
+    // bez powtórzeń tego samego słowa ani jego odmiany (deweloper / deweloperzy)
+    const same = (a, b) => a === b || (a.length >= 6 && b.length >= 6 && a.slice(0, 6) === b.slice(0, 6));
+    if (picked.some(p => p.key.split(' ').some(w => words.some(x => same(w, x))))) continue;
+    picked.push(e);
+  }
+  return picked.map(e => {
+    const m = e.sample.match(new RegExp(e.key.split(' ').map(escRe).join("['’]?s?[\\s-]+"), 'iu'));
+    return { key: e.key, outlets: e.outlets.size, label: m ? m[0] : e.key };
+  });
+}
+
+async function loadNews() {
+  try {
+    const r = await fetch('news.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    data.items = (data.items || []).map(it => Object.assign({}, it, { ts: Date.parse(it.date) }, newsTerms(it.title))).filter(it => !isNaN(it.ts));
+    NEWS = data;
+  } catch (e) { NEWS = { error: e.message, items: [], sources: [] }; }
+  renderNews();
+}
+
+function renderNews() {
+  const box = $('#quick');
+  const seg = (id, opts, cur) => { $(id).innerHTML = opts.map(([v, l]) => `<button type="button" data-v="${v}" aria-pressed="${String(cur) === String(v)}">${esc(l)}</button>`).join(''); };
+  seg('#q-region', [['all', T.qAll], ['swiat', T.qWorld], ['polska', T.qPoland]], newsState.region);
+  seg('#q-range', [[1, T.q24], [3, T.q3], [7, T.q7]], newsState.range);
+  if (!NEWS) { $('#quick-sub').textContent = T.quickSub; box.innerHTML = `<p class="empty">${esc(T.loadingShort)}</p>`; return; }
+  if (NEWS.error) {
+    $('#quick-sub').textContent = T.quickSub; $('#hot').innerHTML = ''; $('#n-quick').textContent = '';
+    box.innerHTML = `<p class="empty">${esc(T.newsMissing)}</p>`;
+    return;
+  }
+  const now = Date.now();
+  const okSources = (NEWS.sources || []).filter(s => s.ok).length;
+  $('#quick-sub').textContent = `${T.quickSub} ${fill(T.newsUpdated, relTime(Date.parse(NEWS.generated))).replace('{s}', okSources)}`;
+
+  const byRegion = NEWS.items.filter(it => newsState.region === 'all' || it.region === newsState.region);
+  let hotBase = byRegion.filter(it => now - it.ts < 864e5);
+  if (hotBase.length < 8) hotBase = byRegion.filter(it => now - it.ts < 2 * 864e5);
+  const hot = hotTopics(hotBase);
+  const hotKeys = hot.map(h => h.key);
+  if (newsState.term && !hotKeys.includes(newsState.term)) newsState.term = '';
+  $('#hot').innerHTML = `<h3>${esc(T.hotTitle)}</h3><p>${esc(T.hotHint)}</p>` + (hot.length
+    ? `<div class="chips">${hot.map(h => `<button type="button" class="chip" data-term="${esc(h.key)}" aria-pressed="${newsState.term === h.key}">${esc(h.label)}<b>${h.outlets}</b></button>`).join('')}</div>`
+    : `<p class="empty">${esc(T.hotNone)}</p>`);
+
+  const list = byRegion
+    .filter(it => now - it.ts < newsState.range * 864e5 && (!newsState.term || it.terms.has(newsState.term)))
+    .sort((a, b) => b.ts - a.ts);
+  $('#n-quick').textContent = NEWS.items.filter(it => now - it.ts < 864e5).length;
+  box.innerHTML = list.length
+    ? `<ul class="rows news">${list.map(it => {
+        const isHot = hotKeys.some(k => it.terms.has(k));
+        return rowHtml({
+          date: it.date, sub: relTime(it.ts),
+          tags: tagKind(it.outlet) + `<span class="tag ${it.region === 'polska' ? 'mid' : 'lo'}">${esc(it.region === 'polska' ? T.qPoland : T.qWorld)}</span>` + (isHot ? `<span class="tag hi">${esc(T.hotTag)}</span>` : ''),
+          title: it.title, url: it.link,
+          meta: it.summary ? esc(it.summary) : (it.via ? esc(T.viaGN) : '')
+        });
+      }).join('')}</ul>`
+    : `<p class="empty">${esc(T.newsEmpty)}</p>`;
+}
+
 /* ============ ZAKŁADKI ============ */
 function currentTab() {
   const h = decodeURIComponent(location.hash.slice(1));
@@ -957,7 +1143,16 @@ document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click
 $('#win').addEventListener('change', () => { try { localStorage.setItem(LS_WIN, $('#win').value); } catch (e) { /* ignoruj */ } render(); });
 $('#q').addEventListener('input', filterDu);
 $('#low').addEventListener('change', filterDu);
-$('#refresh').addEventListener('click', () => { run().catch(fail); });
+$('#refresh').addEventListener('click', () => { run().catch(fail); loadNews(); });
+$('#s-newsy').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.closest('#q-region')) newsState.region = b.dataset.v;
+  else if (b.closest('#q-range')) newsState.range = +b.dataset.v;
+  else if (b.dataset.term != null) newsState.term = newsState.term === b.dataset.term ? '' : b.dataset.term;
+  else return;
+  renderNews();
+});
 function fail(e) {
   loadingNow = false;
   $('#refresh').disabled = false;
@@ -965,6 +1160,8 @@ function fail(e) {
   $('#status-text').textContent = `${T.failed}: ${e && e.message ? e.message : e}. ${T.failedHint}`;
 }
 run().catch(fail);
+renderNews();
+loadNews();
 })();
 </script>
 </body>
