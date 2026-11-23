@@ -330,7 +330,8 @@ const CONFIG = {
   ],
   links: [
     { url: 'https://legislacja.gov.pl/', pl: ['RCL – projekty rozporządzeń', 'Prawo w przygotowaniu, m.in. nowe Warunki Techniczne.'], en: ['RCL – draft regulations', 'Upcoming law, including the new Technical Conditions (WT).'] },
-    { url: 'https://isap.sejm.gov.pl/', pl: ['ISAP – teksty aktów', 'Teksty jednolite i PDF-y aktów prawnych.'], en: ['ISAP – legal texts', 'Consolidated texts and PDFs of Polish legal acts.'] },
+    { url: 'https://dziennikustaw.gov.pl/', pl: ['Dziennik Ustaw – oficjalna strona', 'Akty tak, jak zostały ogłoszone. Otwiera się szybko.'], en: ['Journal of Laws – official site', 'Acts as published. Opens quickly.'] },
+    { url: 'https://isap.sejm.gov.pl/', pl: ['ISAP – teksty ujednolicone', 'Teksty jednolite, ujednolicone i historia zmian. Ładuje się wolniej.'], en: ['ISAP – consolidated texts', 'Consolidated texts and change history. Loads slowly.'] },
     { url: 'https://www.gunb.gov.pl/', pl: ['GUNB', 'Komunikaty nadzoru budowlanego, e-Budownictwo, c-KOB.'], en: ['GUNB – Building Control Office', 'Announcements, e-Budownictwo, digital building logbook (c-KOB).'] },
     { url: 'https://www.gov.pl/web/rozwoj-technologia', pl: ['Ministerstwo Rozwoju i Technologii', 'Konsultacje WT i EPBD. Część rozporządzeń budowlanych w 2026 r. wydaje Minister Finansów i Gospodarki.'], en: ['Ministry of Development and Technology', 'Consultations on WT and EPBD. Some 2026 building regulations are issued by the Minister of Finance and Economy.'] },
     { url: 'https://www.izbaarchitektow.pl/', pl: ['Izba Architektów RP', 'Stanowiska izby, szkolenia, doskonalenie zawodowe.'], en: ['Chamber of Architects of Poland', 'Official positions, training, professional development.'] },
@@ -375,6 +376,7 @@ const I18N = {
     errTitle: 'Część danych nie została pobrana.', errHint: 'Wyniki mogą być niepełne – spróbuj „Odśwież” za chwilę.',
     errSearch: 'Wyszukiwanie w Dzienniku Ustaw', errWatch: 'Obserwowany akt', errTerm: 'Lista kadencji Sejmu', errSejm: 'Sejm – projekty',
     prio: { wysoki: 'ważne', sredni: 'do wglądu', niski: 'poboczne' }, isNew: 'NOWE',
+    isapHint: 'ISAP: tekst ujednolicony i historia zmian (strona ładuje się wolniej, ok. 10 s)',
     kinds: { inForce: 'nowelizacja weszła w życie', planned: 'nowelizacja zaplanowana', exec: 'nowy akt wykonawczy', consolidated: 'tekst jednolity', repeal: 'uchylenie' },
     lbl: { entry: 'wchodzi w życie', lastChange: 'ostatnia zmiana', published: 'opublikowano', promulgated: 'ogłoszono', inForceFrom: 'wejście w życie',
            status: 'Status', amendments: 'Nowelizacji', lastAmend: 'Ostatnia zmiana', scheduled: 'Zaplanowane', none: 'brak',
@@ -414,6 +416,7 @@ const I18N = {
     errTitle: 'Some data could not be fetched.', errHint: 'Results may be incomplete – try “Refresh” in a moment.',
     errSearch: 'Journal of Laws search', errWatch: 'Watched act', errTerm: 'Sejm terms list', errSejm: 'Sejm bills',
     prio: { wysoki: 'important', sredni: 'for review', niski: 'minor' }, isNew: 'NEW',
+    isapHint: 'ISAP: consolidated text and change history (loads slowly, about 10 s)',
     kinds: { inForce: 'amendment in force', planned: 'amendment scheduled', exec: 'new implementing act', consolidated: 'consolidated text', repeal: 'repeal' },
     lbl: { entry: 'enters into force', lastChange: 'last change', published: 'published', promulgated: 'published', inForceFrom: 'in force from',
            status: 'Status', amendments: 'Amendments', lastAmend: 'Last amendment', scheduled: 'Scheduled', none: 'none',
@@ -472,11 +475,27 @@ function daysLabel(s) {
   if (d === -1) return T.yesterday;
   return d > 0 ? fill(T.inDays, d) : fill(T.daysAgo, -d);
 }
-function isap(eli) {
+// Link główny: oficjalna strona Dziennika Ustaw / Monitora Polskiego – szybka i działa dla każdego rocznika.
+function actUrl(eli) {
   const p = String(eli || '').split('/');
-  if (p.length < 3) return 'https://isap.sejm.gov.pl/';
-  return 'https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=' + (p[0] === 'MP' ? 'WMP' : 'WDU') + p[1] + String(p[2]).padStart(7, '0');
+  if (p.length < 3) return 'https://dziennikustaw.gov.pl/';
+  return p[0] === 'MP' ? `https://monitorpolski.gov.pl/MP/${p[1]}/${p[2]}` : `https://dziennikustaw.gov.pl/DU/${p[1]}/${p[2]}`;
 }
+// ISAP (tekst ujednolicony, historia zmian). Adres bierzemy z API; przed 2012 r. zawiera numer dziennika,
+// więc bez adresu z API budujemy link tylko dla aktów od 2012 r.
+function isapUrl(address, eli) {
+  let id = address || '';
+  if (!id && eli) {
+    const p = String(eli).split('/');
+    if (p.length === 3 && +p[1] >= 2012) id = (p[0] === 'MP' ? 'WMP' : 'WDU') + p[1] + String(p[2]).padStart(7, '0');
+  }
+  return id ? 'https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=' + id : '';
+}
+const isapLink = (address, eli) => {
+  const u = isapUrl(address, eli);
+  return u ? ` · <a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(T.isapHint)}">ISAP</a>` : '';
+};
+const eliNum = eli => { const p = String(eli || '').split('/'); return p.length === 3 ? (+p[1]) * 100000 + (+p[2]) : 0; };
 function displayAddr(eli) {
   const p = String(eli || '').split('/');
   return p.length < 3 ? String(eli || '') : `${p[0] === 'MP' ? 'M.P.' : 'Dz.U.'} ${p[1]} poz. ${p[2]}`;
@@ -585,6 +604,7 @@ async function fetchActs(errors) {
     eli: it.ELI,
     title: it.title || it.ELI,
     display: it.displayAddress || displayAddr(it.ELI),
+    address: it.address || '',
     type: it.type || '',
     status: it.status || '',
     promulgation: short(it.promulgation),
@@ -598,7 +618,7 @@ async function fetchWatched(errors) {
     const out = { ...w, title: '', status: '', refs: [], ok: false };
     try {
       const a = await getJson('/eli/acts/' + w.eli);
-      out.ok = true; out.title = a.title || ''; out.status = a.status || '';
+      out.ok = true; out.title = a.title || ''; out.status = a.status || ''; out.address = a.address || '';
       const R = a.references || {};
       for (const [type, kind] of Object.entries(REF_TYPES)) {
         for (const r of (R[type] || [])) {
@@ -676,14 +696,14 @@ async function run() {
 
   // tytuły aktów zmieniających (z pamięci podręcznej albo z API)
   const titles = Object.assign({}, st.titles || {});
-  acts.forEach(a => { titles[a.eli] = { t: a.title, d: a.display }; });
+  acts.forEach(a => { titles[a.eli] = { t: a.title, d: a.display, a: a.address }; });
   const need = new Set();
   watched.forEach(w => w.refs.forEach(r => {
     const d = daysFromToday(r.date);
     if (r.isNew || (d != null && d >= -90 && d <= CONFIG.calendarDays)) need.add(r.id);
   }));
   await Promise.all([...need].filter(id => !titles[id]).map(async id => {
-    try { const a = await getJson('/eli/acts/' + id); titles[id] = { t: a.title || id, d: a.displayAddress || displayAddr(id) }; }
+    try { const a = await getJson('/eli/acts/' + id); titles[id] = { t: a.title || id, d: a.displayAddress || displayAddr(id), a: a.address || '' }; }
     catch (e) { /* bez tytułu pokażemy sam numer */ }
   }));
 
@@ -728,8 +748,8 @@ function buildNews(m, win) {
     out.push({
       date: a.promulgation, isNew: a.isNew,
       tags: tagNew(a.isNew) + tagKind(`${T.lbl.dzu} · ${typeText(a.type)}`) + tagPrio(a.prio),
-      title: a.title, url: isap(a.eli),
-      meta: `<span class="mono">${esc(a.display)}</span>`,
+      title: a.title, url: actUrl(a.eli),
+      meta: `<span class="mono">${esc(a.display)}</span>${isapLink(a.address, a.eli)}`,
       side: a.entry ? `<span class="lbl">${esc(T.lbl.entry)}</span><b>${esc(fmtDate(a.entry))}</b>${esc(daysLabel(a.entry))}` : ''
     });
   }
@@ -741,8 +761,8 @@ function buildNews(m, win) {
     out.push({
       date: r.date, isNew: r.isNew,
       tags: tagNew(r.isNew) + tagKind(refLabel(r)) + tagPrio('wysoki'),
-      title: `${nameOf(w)}: ${t ? t.t : displayAddr(r.id)}`, url: isap(r.id),
-      meta: `<span class="mono">${esc(t ? t.d : displayAddr(r.id))}</span>`,
+      title: `${nameOf(w)}: ${t ? t.t : displayAddr(r.id)}`, url: actUrl(r.id),
+      meta: `<span class="mono">${esc(t ? t.d : displayAddr(r.id))}</span>${isapLink(t && t.a, r.id)}`,
       side: ''
     });
   }
@@ -767,7 +787,7 @@ function buildCalendar(m) {
     if (a.prio === 'niski') continue;
     const d = daysFromToday(a.entry);
     if (d != null && d >= 0 && d <= CONFIG.calendarDays) {
-      map.set(a.eli + '|' + a.entry, { date: a.entry, title: a.title, url: isap(a.eli), src: T.lbl.journal, prio: a.prio, meta: a.display });
+      map.set(a.eli + '|' + a.entry, { date: a.entry, title: a.title, url: actUrl(a.eli), src: T.lbl.journal, prio: a.prio, meta: a.display });
     }
   }
   for (const w of m.watched) for (const r of w.future) {
@@ -778,7 +798,7 @@ function buildCalendar(m) {
     const prev = map.get(key);
     const names = prev && prev.watchNames ? prev.watchNames.concat(nameOf(w)) : [nameOf(w)];
     map.set(key, {
-      date: r.date, title: t ? t.t : displayAddr(r.id), url: isap(r.id), prio: 'wysoki',
+      date: r.date, title: t ? t.t : displayAddr(r.id), url: actUrl(r.id), prio: 'wysoki',
       src: `${T.lbl.amends}: ${names.join(', ')}`, watchNames: names, meta: t ? t.d : displayAddr(r.id)
     });
   }
@@ -847,16 +867,19 @@ function render() {
   $('#watch').innerHTML = `<ul class="rows">${m.watched.map(w => {
     const last = w.past[0];
     const lastHtml = last
-      ? `<a href="${esc(isap(last.id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(last.date))}</b></a><small>${esc(daysLabel(last.date))}</small>`
+      ? `<a href="${esc(actUrl(last.id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(last.date))}</b></a><small>${esc(daysLabel(last.date))}</small>`
       : '<small>—</small>';
     const byDate = new Map();
     w.future.forEach(f => { if (!byDate.has(f.date)) byDate.set(f.date, []); byDate.get(f.date).push(f); });
     const futHtml = byDate.size
-      ? [...byDate.entries()].map(([d, list]) => `<a href="${esc(isap(list[0].id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(d))}${list.length > 1 ? ' ×' + list.length : ''}</b></a>`).join('') + `<small>${esc(daysLabel(w.future[0].date))}</small>`
+      ? [...byDate.entries()].map(([d, list]) => `<a href="${esc(actUrl(list[0].id))}" target="_blank" rel="noopener"><b>${esc(fmtDate(d))}${list.length > 1 ? ' ×' + list.length : ''}</b></a>`).join('') + `<small>${esc(daysLabel(w.future[0].date))}</small>`
       : `<small>${esc(T.lbl.none)}</small>`;
+    // najnowszy tekst jednolity – to z niego architekt korzysta na co dzień
+    const tj = w.refs.filter(r => r.kind === 'consolidated').sort((a, b) => eliNum(b.id) - eliNum(a.id))[0];
+    const tjHtml = tj ? ` · ${esc(T.kinds.consolidated)}: <a href="${esc(actUrl(tj.id))}" target="_blank" rel="noopener">${esc(displayAddr(tj.id))}</a>` : '';
     return `<li class="row w">` +
-      `<div class="r-main"><a class="t" href="${esc(isap(w.eli))}" target="_blank" rel="noopener"><b>${esc(nameOf(w))}</b></a>` +
-      `<div class="r-meta">${esc(w.ok ? w.title : T.watchFail)}</div></div>` +
+      `<div class="r-main"><a class="t" href="${esc(actUrl(tj ? tj.id : w.eli))}" target="_blank" rel="noopener"><b>${esc(nameOf(w))}</b></a>` +
+      `<div class="r-meta">${esc(w.ok ? w.title : T.watchFail)}${tjHtml}${w.ok ? isapLink(w.address, w.eli) : ''}</div></div>` +
       `<div class="r-col"><span class="lbl">${esc(T.lbl.status)}</span>${tagStatus(w.status) || '<small>—</small>'}</div>` +
       `<div class="r-col"><span class="lbl">${esc(T.lbl.amendments)}</span><b>${w.amendCount}</b></div>` +
       `<div class="r-col"><span class="lbl">${esc(T.lbl.lastAmend)}</span>${lastHtml}</div>` +
@@ -869,7 +892,7 @@ function render() {
     tags: tagNew(p.isNew) + tagStatus(p.status),
     title: p.title, url: p.url,
     meta: `${esc(T.lbl.print)} <span class="mono">${esc(p.number)}</span> · ${esc(T.lbl.submitted)} ${esc(fmtDate(p.start))}${p.desc ? ' · ' + esc(p.desc) : ''}`,
-    side: p.eli ? `<span class="lbl">${esc(T.lbl.published)}</span><a href="${esc(isap(p.eli))}" target="_blank" rel="noopener"><b>${esc(displayAddr(p.eli))}</b></a>` : ''
+    side: p.eli ? `<span class="lbl">${esc(T.lbl.published)}</span><a href="${esc(actUrl(p.eli))}" target="_blank" rel="noopener"><b>${esc(displayAddr(p.eli))}</b></a>` : ''
   });
   $('#sejm-list').innerHTML =
     (activeP.length ? `<ul class="rows">${activeP.map(procRow).join('')}</ul>` : `<p class="empty">${esc(T.sejmEmpty)}</p>`) +
@@ -881,7 +904,7 @@ function render() {
     ? `<ul class="rows" id="du-list">${acts.map(a => rowHtml({
         date: a.promulgation, sub: T.lbl.promulgated,
         tags: tagNew(a.isNew) + tagPrio(a.prio) + tagStatus(a.status),
-        title: a.title, url: isap(a.eli), meta: `<span class="mono">${esc(a.display)}</span>${a.type ? ' · ' + esc(typeText(a.type)) : ''}`,
+        title: a.title, url: actUrl(a.eli), meta: `<span class="mono">${esc(a.display)}</span>${a.type ? ' · ' + esc(typeText(a.type)) : ''}${isapLink(a.address, a.eli)}`,
         side: a.entry ? `<span class="lbl">${esc(T.lbl.inForceFrom)}</span><b>${esc(fmtDate(a.entry))}</b>` : '',
         attrs: ` data-p="${esc(a.prio)}"`
       })).join('')}</ul><p class="empty" id="du-none" hidden>${esc(T.duNone)}</p>`
