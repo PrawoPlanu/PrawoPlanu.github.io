@@ -68,7 +68,7 @@ h1{font:700 clamp(34px,5vw,52px)/1.05 var(--f-display);margin:4px 0 0;letter-spa
 
 /* nawigacja */
 nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
-nav.tabs .wrap{position:relative;display:flex;gap:0 26px;overflow-x:auto;scrollbar-width:none}
+nav.tabs .wrap{position:relative;display:flex;gap:0 20px;overflow-x:auto;scrollbar-width:none}
 nav.tabs .wrap::-webkit-scrollbar{display:none}
 nav.tabs a{position:relative;font:500 14.5px var(--f-body);text-decoration:none;white-space:nowrap;color:var(--mut);padding:13px 0 14px;transition:color .2s}
 nav.tabs a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--olive);transform:scaleX(0);transform-origin:left center;transition:transform .3s cubic-bezier(.2,.7,.2,1),background-color .2s}
@@ -161,6 +161,17 @@ select{font:inherit;font-size:13.5px;padding:6px 8px;border:1px solid var(--line
 .seg button[aria-pressed="true"]{background:var(--mahogany);color:#FFFFFF}
 .rows.news .r-meta{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px}
 .note{color:var(--mut);font-size:12.5px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+/* wydarzenia */
+#ev-types{padding:4px 0 6px}
+.row.ev{grid-template-columns:10.5rem minmax(0,1fr) auto;align-items:start}
+.row.ev.is-past{opacity:.65}
+.tag.tbc{background:transparent;color:var(--hi);box-shadow:inset 0 0 0 1px var(--hi)}
+.btn-ghost{font:600 12.5px var(--f-body);background:transparent;color:var(--ink);border:1px solid var(--line-strong);border-radius:999px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:background-color .2s,border-color .2s,transform .15s}
+.btn-ghost:hover{background:var(--linen);border-color:var(--mahogany)}
+.btn-ghost:active{transform:scale(.96)}
+.ev-media-h{margin-top:28px!important}
+.ev-media-sub{margin:6px 0 0;padding-top:0;border-top:0}
+@media (max-width:640px){.row.ev{grid-template-columns:minmax(0,1fr)}}
 /* normy */
 #n-cats{padding:4px 0 6px}
 #n-info{margin:8px 0 0;padding-top:0;border-top:0}
@@ -263,6 +274,7 @@ a.stat:hover b{color:var(--mahogany)}
   <div class="wrap">
     <a href="#nowosci"><b data-i18n="nav.news"></b><span id="n-news"></span></a>
     <a href="#newsy"><b data-i18n="nav.quick"></b><span id="n-quick"></span></a>
+    <a href="#wydarzenia"><b data-i18n="nav.events"></b><span id="n-events"></span></a>
     <a href="#kalendarz"><b data-i18n="nav.cal"></b><span id="n-cal"></span></a>
     <a href="#obserwowane"><b data-i18n="nav.watch"></b><span id="n-watch"></span></a>
     <a href="#sejm"><b data-i18n="nav.sejm"></b><span id="n-sejm"></span></a>
@@ -303,6 +315,25 @@ a.stat:hover b{color:var(--mahogany)}
       </div>
       <div id="quick"><p class="empty" data-i18n="loadingShort"></p></div>
       <p class="note" data-i18n="newsNote"></p>
+    </div>
+  </section>
+
+  <section class="sheet" id="s-wydarzenia" data-tab="wydarzenia" hidden>
+    <div class="sheet-h"><div>
+      <h2 data-i18n="evTitle"></h2>
+      <p data-i18n="evSub"></p>
+    </div></div>
+    <div class="sheet-b">
+      <div class="tools">
+        <div class="seg" id="ev-region" role="group" aria-label="Region"></div>
+        <label><input type="checkbox" id="ev-past"> <span data-i18n="evPast"></span></label>
+      </div>
+      <div class="chips" id="ev-types"></div>
+      <div id="events"><p class="empty" data-i18n="loadingShort"></p></div>
+      <h3 class="month ev-media-h" data-i18n="evMedia"></h3>
+      <p class="note ev-media-sub" data-i18n="evMediaSub"></p>
+      <div id="ev-media"><p class="empty" data-i18n="loadingShort"></p></div>
+      <p class="note" data-i18n="evNote"></p>
     </div>
   </section>
 
@@ -511,6 +542,70 @@ const KEY_NORMS = [
   { cat: 'wyroby', num: 'PN-EN 14351-1', pl: 'Okna i drzwi zewnętrzne – właściwości użytkowe', en: 'Windows and external doors – performance characteristics' },
   { cat: 'wyroby', num: 'PN-EN 13830', pl: 'Ściany osłonowe (fasady)', en: 'Curtain walling' }
 ];
+/* ============ WYDARZENIA ============ */
+// Terminy sprawdzone 25.11.2026 (strony organizatorów i serwisy branżowe). tbc = organizator nie potwierdził daty;
+// month = przybliżony miesiąc, gdy brak dni. Aktualizacja: dopisz/zmień wpis poniżej.
+const EVENTS = [
+  { id: 'warsaw-build-week-2026', name: 'Warsaw Build Week', start: '2026-11-24', end: '2026-11-26', region: 'pl', type: 'targi',
+    city: { pl: 'Nadarzyn k. Warszawy · Ptak Warsaw Expo', en: 'Nadarzyn near Warsaw · Ptak Warsaw Expo' }, url: 'https://warsawexpo.eu/en/fair-calendar/warsaw-build-week/',
+    desc: { pl: 'Tydzień targów budowlanych w Ptak Warsaw Expo.', en: 'A week of construction trade fairs at Ptak Warsaw Expo.' } },
+  { id: 'big5-2026', name: 'Big 5 Global', start: '2026-11-23', end: '2026-11-26', region: 'swiat', type: 'targi',
+    city: { pl: 'Dubaj, ZEA · Dubai World Trade Centre', en: 'Dubai, UAE · Dubai World Trade Centre' }, url: 'https://www.big5global.com/',
+    desc: { pl: 'Jedne z największych targów budowlanych na świecie: materiały, instalacje, technologie cyfrowe, ok. 1800 wystawców.', en: 'One of the world’s largest construction shows: materials, MEP, digital construction, around 1,800 exhibitors.' } },
+  { id: 'waf-2026', name: 'World Architecture Festival 2026', start: '2026-11-18', end: '2026-11-20', region: 'swiat', type: 'festiwal',
+    city: { pl: 'Fort Lauderdale, USA · Broward County Convention Center', en: 'Fort Lauderdale, USA · Broward County Convention Center' }, url: 'https://worldarchitecturefestival.com/',
+    desc: { pl: 'Festiwal i konkurs architektoniczny – projekty prezentowane na żywo przed jury.', en: 'Architecture festival and awards with live project presentations to the jury.' } },
+  { id: 'bau-2027', name: 'BAU 2027', start: '2027-01-11', end: '2027-01-15', region: 'swiat', type: 'targi',
+    city: { pl: 'Monachium, Niemcy · Messe München', en: 'Munich, Germany · Messe München' }, url: 'https://bau-muenchen.com/en/',
+    desc: { pl: 'Światowe targi architektury, materiałów i systemów budowlanych (co dwa lata). Temat przewodni: ochrona klimatu i adaptacja.', en: 'World’s leading fair for architecture, materials and systems (biennial). Lead theme: climate protection and adaptation.' } },
+  { id: '4dd-2027', name: '4 Design Days 2027', tbc: true, month: '2027-01', region: 'pl', type: 'konferencja',
+    city: { pl: 'Katowice · Międzynarodowe Centrum Kongresowe', en: 'Katowice · International Congress Centre' }, url: 'https://4dd.pl/',
+    desc: { pl: 'Forum architektury, wnętrz i nieruchomości z debatami i wystawą. Poprzednie edycje: koniec stycznia.', en: 'Architecture, interiors and real estate forum with debates and an exhibition. Previous editions: late January.' } },
+  { id: 'budma-2027', name: 'BUDMA 2027', start: '2027-01-26', end: '2027-01-29', region: 'pl', type: 'targi',
+    city: { pl: 'Poznań · Międzynarodowe Targi Poznańskie', en: 'Poznań · Poznań International Fair' }, url: 'https://www.budma.pl/',
+    desc: { pl: 'Międzynarodowe Targi Budownictwa i Architektury – coroczne spotkanie branży budowlanej w Poznaniu.', en: 'International Construction and Architecture Fair – the annual building industry meeting in Poznań.' } },
+  { id: 'ish-2027', name: 'ISH 2027', start: '2027-03-15', end: '2027-03-19', region: 'swiat', type: 'targi',
+    city: { pl: 'Frankfurt nad Menem, Niemcy · Messe Frankfurt', en: 'Frankfurt am Main, Germany · Messe Frankfurt' }, url: 'https://ish.messefrankfurt.com/',
+    desc: { pl: 'Światowe targi ogrzewania, wentylacji, klimatyzacji i łazienek (co dwa lata).', en: 'World’s leading fair for heating, ventilation, air conditioning and bathrooms (biennial).' } },
+  { id: 'mipim-2027', name: 'MIPIM 2027', start: '2027-03-16', end: '2027-03-19', region: 'swiat', type: 'konferencja',
+    city: { pl: 'Cannes, Francja · Palais des Festivals', en: 'Cannes, France · Palais des Festivals' }, url: 'https://www.mipim.com/',
+    desc: { pl: 'Międzynarodowe targi i konferencja rynku nieruchomości i rozwoju miast.', en: 'International property market and urban development event and conference.' } },
+  { id: 'salone-2027', name: 'Salone del Mobile.Milano 2027', start: '2027-04-13', end: '2027-04-18', region: 'swiat', type: 'targi',
+    city: { pl: 'Mediolan (Rho), Włochy · Fiera Milano', en: 'Milan (Rho), Italy · Fiera Milano' }, url: 'https://www.salonemilano.it/en',
+    desc: { pl: 'Międzynarodowe targi mebli i wnętrz; równolegle Milan Design Week (12–18 kwietnia).', en: 'International furniture and interiors fair; Milan Design Week runs alongside (12–18 April).' } },
+  { id: 'biennale-2027', name: { pl: '20. Biennale Architektury w Wenecji', en: '20th Venice Architecture Biennale' }, start: '2027-05-08', end: '2027-11-21', region: 'swiat', type: 'festiwal',
+    city: { pl: 'Wenecja, Włochy · Giardini i Arsenale', en: 'Venice, Italy · Giardini and Arsenale' }, url: 'https://www.labiennale.org/en',
+    desc: { pl: 'Kuratorzy: Wang Shu i Lu Wenyu. Temat: „Do Architecture — For the Possibility of Coexistence Facing a Real Reality”.', en: 'Curators: Wang Shu and Lu Wenyu. Theme: “Do Architecture — For the Possibility of Coexistence Facing a Real Reality”.' } },
+  { id: 'futurebuild-2027', name: 'Futurebuild 2027', start: '2027-05-11', end: '2027-05-13', region: 'swiat', type: 'targi',
+    city: { pl: 'Londyn, Wielka Brytania · ExCeL London', en: 'London, UK · ExCeL London' }, url: 'https://futurebuild.co.uk/',
+    desc: { pl: 'Targi i konferencja zrównoważonego budownictwa; równolegle UK Construction Week London.', en: 'Sustainable built environment show and conference, alongside UK Construction Week London.' } },
+  { id: 'open-house-gdynia-2027', name: 'Open House Gdynia 2027', tbc: true, month: '2027-05', region: 'pl', type: 'festiwal',
+    city: { pl: 'Gdynia', en: 'Gdynia, Poland' }, url: 'https://openhouseworldwide.org/gdynia',
+    desc: { pl: 'Festiwal architektury: zwiedzanie budynków na co dzień niedostępnych. W 2026 r. odbył się 29–31 maja.', en: 'Architecture festival opening buildings normally closed to the public. The 2026 edition ran 29–31 May.' } },
+  { id: 'lfa-2027', name: 'London Festival of Architecture 2027', tbc: true, start: '2027-06-01', end: '2027-06-30', region: 'swiat', type: 'festiwal',
+    city: { pl: 'Londyn, Wielka Brytania', en: 'London, UK' }, url: 'https://londonfestivalofarchitecture.org/',
+    desc: { pl: 'Miesiąc wydarzeń o architekturze i mieście w całym Londynie.', en: 'A month-long programme on architecture and city-making across London.' } },
+  { id: 'gdd-2027', name: 'Gdynia Design Days 2027', tbc: true, month: '2027-06', region: 'pl', type: 'festiwal',
+    city: { pl: 'Gdynia', en: 'Gdynia, Poland' }, url: 'https://gdyniadesigndays.eu/en',
+    desc: { pl: 'Festiwal designu i architektury. W 2026 r. odbył się 20–28 czerwca.', en: 'Design and architecture festival. The 2026 edition ran 20–28 June.' } },
+  { id: 'cersaie-2027', name: 'Cersaie 2027', start: '2027-09-27', end: '2027-10-01', region: 'swiat', type: 'targi',
+    city: { pl: 'Bolonia, Włochy · BolognaFiere', en: 'Bologna, Italy · BolognaFiere' }, url: 'https://www.cersaie.it/en/',
+    desc: { pl: 'Międzynarodowe targi ceramiki budowlanej i wyposażenia łazienek.', en: 'International exhibition of ceramic tiles and bathroom furnishings.' } },
+  { id: 'ddw-2027', name: 'Dutch Design Week 2027', tbc: true, start: '2027-10-23', end: '2027-10-31', region: 'swiat', type: 'festiwal',
+    city: { pl: 'Eindhoven, Holandia', en: 'Eindhoven, Netherlands' }, url: 'https://ddw.nl/en',
+    desc: { pl: 'Festiwal designu: wystawy, instalacje i projekty z całego świata.', en: 'Design festival with exhibitions, installations and projects from around the world.' } },
+  { id: 'whc-2027', name: 'Warsaw Home & Contract 2027', tbc: true, start: '2027-10-26', end: '2027-10-29', region: 'pl', type: 'targi',
+    city: { pl: 'Nadarzyn k. Warszawy · Ptak Warsaw Expo', en: 'Nadarzyn near Warsaw · Ptak Warsaw Expo' }, url: 'https://warsawhome.eu/',
+    desc: { pl: 'Targi wyposażenia wnętrz i projektów kontraktowych.', en: 'Interior design and contract furnishing fair.' } },
+  { id: 'waf-2027', name: 'World Architecture Festival 2027', tbc: true, month: '2027-11', region: 'swiat', type: 'festiwal',
+    city: { pl: 'miejsce do ogłoszenia', en: 'venue to be announced' }, url: 'https://worldarchitecturefestival.com/',
+    desc: { pl: 'Festiwal i konkurs architektoniczny – poprzednie edycje w listopadzie.', en: 'Architecture festival and awards – previous editions held in November.' } },
+  { id: 'bauma-2028', name: 'bauma 2028', start: '2028-04-03', end: '2028-04-09', region: 'swiat', type: 'targi',
+    city: { pl: 'Monachium, Niemcy · Messe München', en: 'Munich, Germany · Messe München' }, url: 'https://bauma.de/en/',
+    desc: { pl: 'Światowe targi maszyn budowlanych (co trzy lata).', en: 'World’s leading trade fair for construction machinery (every three years).' } }
+];
+const EV_TYPES = ['targi', 'konferencja', 'festiwal'];
+
 const NORM_CATS = ['konstrukcje', 'cieplne', 'akustyka', 'swiatlo', 'ppoz', 'dostepnosc', 'wentylacja', 'dokumentacja', 'zrownowazone', 'instalacje', 'wyroby'];
 const ICS_GROUPS = ['91.010', '91.020', '91.040', '91.060', '91.080', '91.090', '91.100', '91.120', '91.140', '91.160', '91.180', '91.190', '91.200', '91.220', '93'];
 
@@ -538,6 +633,9 @@ const PHOTOS = {
   normy: { src: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Technical_drawing%2C_drawing_board%2C_workplace%2C_planning%2C_men%2C_work_Fortepan_3557.jpg/1280px-Technical_drawing%2C_drawing_board%2C_workplace%2C_planning%2C_men%2C_work_Fortepan_3557.jpg',
     page: 'https://commons.wikimedia.org/wiki/File:Technical_drawing,_drawing_board,_workplace,_planning,_men,_work_Fortepan_3557.jpg', author: 'Fortepan (ID 3557)', lic: 'domena publiczna', licEn: 'public domain', licUrl: '', pos: '50% 55%',
     alt: { pl: 'Archiwalne biuro kreślarskie z deskami do rysunku technicznego', en: 'Historic drafting office with drawing boards' } },
+  wydarzenia: { src: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Targi_Messe_Fair_-_Pozna%C5%84_-_panoramio.jpg/1280px-Targi_Messe_Fair_-_Pozna%C5%84_-_panoramio.jpg',
+    page: 'https://commons.wikimedia.org/wiki/File:Targi_Messe_Fair_-_Pozna%C5%84_-_panoramio.jpg', author: 'Przemyslaw Parzysz', lic: 'CC BY-SA 3.0', licUrl: 'https://creativecommons.org/licenses/by-sa/3.0/', pos: '50% 45%',
+    alt: { pl: 'Wejście na teren Międzynarodowych Targów Poznańskich', en: 'Entrance to the Poznań International Fair' } },
   zrodla: { src: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Hamamatsu_Municipal_Sakuma_Library_reading_room_ac_%284%29.jpg/1280px-Hamamatsu_Municipal_Sakuma_Library_reading_room_ac_%284%29.jpg',
     page: 'https://commons.wikimedia.org/wiki/File:Hamamatsu_Municipal_Sakuma_Library_reading_room_ac_(4).jpg', author: 'Asturio Cantabrio', lic: 'CC BY-SA 4.0', licUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', pos: '50% 50%',
     alt: { pl: 'Czytelnia biblioteki z regałami pełnymi książek', en: 'Library reading room with full bookshelves' } }
@@ -573,7 +671,18 @@ const I18N = {
            '91.180': 'Wykończenie wnętrz', '91.190': 'Akcesoria budowlane', '91.200': 'Technologia budowy', '91.220': 'Sprzęt budowlany',
            '93': 'Inżynieria lądowa (drogi, mosty, roboty ziemne)' },
     normsNote: 'Polskie Normy wydaje i sprzedaje PKN, który nie udostępnia ich listy w otwartej formie – aktualne wydanie sprawdzisz przyciskiem „Wydanie w PKN”. Treść norm jest płatna; bezpłatnie przeczytasz je w czytelni PKN, a wiele bibliotek uczelni technicznych daje studentom dostęp do norm online. Stosowanie Polskich Norm jest dobrowolne, chyba że przepis (np. Warunki Techniczne) powołuje konkretną normę. Normy ISO pochodzą z ISO Open Data.',
-    nav: { news: 'Nowości', quick: 'Szybkie newsy', norms: 'Normy', cal: 'Kalendarz', watch: 'Obserwowane akty', sejm: 'Projekty w Sejmie', du: 'Dziennik Ustaw', links: 'Źródła' },
+    evTitle: 'Wydarzenia',
+    evSub: 'Targi, konferencje i festiwale architektury i budownictwa w Polsce i na świecie. Terminy sprawdzone u organizatorów i w serwisach branżowych – przed wyjazdem potwierdź je na stronie wydarzenia.',
+    evRegion: { all: 'Wszystkie', pl: 'Polska', swiat: 'Świat' },
+    evTypes: { targi: 'Targi', konferencja: 'Konferencje', festiwal: 'Festiwale i wystawy' },
+    evType1: { targi: 'targi', konferencja: 'konferencja', festiwal: 'festiwal / wystawa' },
+    evPast: 'pokaż zakończone', evNow: 'trwa teraz', evEnded: 'zakończone', evTbc: 'termin do potwierdzenia',
+    evIcs: 'Do kalendarza', evSite: 'Strona wydarzenia', evNone: 'Brak wydarzeń dla wybranych filtrów.',
+    evMedia: 'Zapowiedzi i relacje z mediów',
+    evMediaSub: 'Artykuły o targach, konferencjach i festiwalach z ostatnich 14 dni (Google News), odświeżane automatycznie co 3 godziny.',
+    evMediaNone: 'Brak artykułów w tym zakresie.',
+    evNote: 'Wydarzenia z dopiskiem „termin do potwierdzenia” podajemy na podstawie poprzednich edycji lub serwisów branżowych – organizator nie ogłosił jeszcze oficjalnej daty. Przycisk „Do kalendarza” pobiera plik .ics dla Google, Outlooka i iPhone’a.',
+    nav: { news: 'Nowości', quick: 'Szybkie newsy', events: 'Wydarzenia', norms: 'Normy', cal: 'Kalendarz', watch: 'Obserwowane akty', sejm: 'Projekty w Sejmie', du: 'Dziennik Ustaw', links: 'Źródła' },
     quickTitle: 'Szybkie newsy',
     quickSub: 'Najświeższe wiadomości z architektury i budownictwa z całego świata, odświeżane automatycznie co 3 godziny.',
     newsUpdated: 'Ostatnia aktualizacja: {n}, działające źródła: {s}.',
@@ -645,7 +754,18 @@ const I18N = {
            '91.180': 'Interior finishing', '91.190': 'Building accessories', '91.200': 'Construction technology', '91.220': 'Construction equipment',
            '93': 'Civil engineering (roads, bridges, earthworks)' },
     normsNote: 'Polish Standards are published and sold by PKN, which does not offer an open list – check the current edition with the “Edition at PKN” button. Standards are paid; you can read them for free in the PKN reading room, and many technical university libraries give students online access. Applying Polish Standards is voluntary unless a regulation (e.g. the Technical Conditions) refers to a specific one. ISO data comes from ISO Open Data.',
-    nav: { news: 'What’s new', quick: 'Quick news', norms: 'Standards', cal: 'Calendar', watch: 'Watched acts', sejm: 'Bills in the Sejm', du: 'Journal of Laws', links: 'Sources' },
+    evTitle: 'Events',
+    evSub: 'Trade fairs, conferences and festivals on architecture and construction in Poland and worldwide. Dates checked with organisers and industry listings – confirm them on the event website before you travel.',
+    evRegion: { all: 'All', pl: 'Poland', swiat: 'World' },
+    evTypes: { targi: 'Trade fairs', konferencja: 'Conferences', festiwal: 'Festivals & exhibitions' },
+    evType1: { targi: 'trade fair', konferencja: 'conference', festiwal: 'festival / exhibition' },
+    evPast: 'show past events', evNow: 'on now', evEnded: 'ended', evTbc: 'date to be confirmed',
+    evIcs: 'Add to calendar', evSite: 'Event website', evNone: 'No events match the filters.',
+    evMedia: 'Previews and reports in the media',
+    evMediaSub: 'Articles about trade fairs, conferences and festivals from the last 14 days (Google News), refreshed automatically every 3 hours.',
+    evMediaNone: 'No articles in this range.',
+    evNote: 'Events marked “date to be confirmed” are based on previous editions or industry listings – the organiser has not announced an official date yet. “Add to calendar” downloads an .ics file for Google, Outlook and iPhone.',
+    nav: { news: 'What’s new', quick: 'Quick news', events: 'Events', norms: 'Standards', cal: 'Calendar', watch: 'Watched acts', sejm: 'Bills in the Sejm', du: 'Journal of Laws', links: 'Sources' },
     quickTitle: 'Quick news',
     quickSub: 'The latest architecture and construction news from around the world, refreshed automatically every 3 hours.',
     newsUpdated: 'Last update: {n}, sources working: {s}.',
@@ -702,7 +822,7 @@ const API = 'https://api.sejm.gov.pl';
 const LS_STATE = 'prawo-planu:stan:v1';
 const LS_WIN = 'prawo-planu:okres';
 const LS_LANG = 'prawo-planu:jezyk';
-const TABS = ['nowosci', 'newsy', 'kalendarz', 'obserwowane', 'sejm', 'dziennik', 'normy', 'zrodla'];
+const TABS = ['nowosci', 'newsy', 'wydarzenia', 'kalendarz', 'obserwowane', 'sejm', 'dziennik', 'normy', 'zrodla'];
 const STAT_TABS = ['nowosci', 'nowosci', 'kalendarz', 'sejm', 'obserwowane'];
 const REF_TYPES = {
   'Akty zmieniające': 'amend',
@@ -832,6 +952,7 @@ function setLang(l) {
   applyStatic();
   if (model) render(); else if (loadingNow) progress();
   renderNews();
+  renderEvents();
   renderNorms();
 }
 
@@ -1313,9 +1434,19 @@ async function loadNews() {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     data.items = (data.items || []).map(it => Object.assign({}, it, { ts: Date.parse(it.date) }, newsTerms(it.title))).filter(it => !isNaN(it.ts));
+    // ten sam artykuł bywa i w kanale redakcji, i w Google News – zostaw jeden (ten z zajawką)
+    const byTitle = new Map();
+    data.items = data.items.filter(it => {
+      const k = it.title.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+      const prev = byTitle.get(k);
+      if (!prev) { byTitle.set(k, it); return true; }
+      if (!prev.summary && it.summary) Object.assign(prev, it);
+      return false;
+    });
     NEWS = data;
   } catch (e) { NEWS = { error: e.message, items: [], sources: [] }; }
   renderNews();
+  renderEvents();
 }
 
 function renderNews() {
@@ -1333,7 +1464,8 @@ function renderNews() {
   const okSources = (NEWS.sources || []).filter(s => s.ok).length;
   $('#quick-sub').textContent = `${T.quickSub} ${fill(T.newsUpdated, relTime(Date.parse(NEWS.generated))).replace('{s}', okSources)}`;
 
-  const byRegion = NEWS.items.filter(it => newsState.region === 'all' || it.region === newsState.region);
+  const newsItems = NEWS.items.filter(it => it.topic !== 'wydarzenia');   // zapowiedzi wydarzeń są w zakładce Wydarzenia
+  const byRegion = newsItems.filter(it => newsState.region === 'all' || it.region === newsState.region);
   let hotBase = byRegion.filter(it => now - it.ts < 864e5);
   if (hotBase.length < 8) hotBase = byRegion.filter(it => now - it.ts < 2 * 864e5);
   const hot = hotTopics(hotBase);
@@ -1346,7 +1478,7 @@ function renderNews() {
   const list = byRegion
     .filter(it => now - it.ts < newsState.range * 864e5 && (!newsState.term || it.terms.has(newsState.term)))
     .sort((a, b) => b.ts - a.ts);
-  $('#n-quick').textContent = NEWS.items.filter(it => now - it.ts < 864e5).length;
+  $('#n-quick').textContent = newsItems.filter(it => now - it.ts < 864e5).length;
   box.innerHTML = list.length
     ? `<ul class="rows news">${list.map(it => {
         const isHot = hotKeys.some(k => it.terms.has(k));
@@ -1424,6 +1556,115 @@ function renderNorms() {
   }).join('');
   box.innerHTML = html || `<p class="empty">${esc(T.normsNone)}</p>`;
   reveal(box);
+}
+
+/* ============ WYDARZENIA – WIDOK ============ */
+const evState = { region: 'all', type: '', past: false };
+const evName = e => typeof e.name === 'string' ? e.name : (e.name[lang] || e.name.pl);
+const evStart = e => e.start || (e.month + '-01');
+function evEnd(e) {
+  if (e.end) return e.end;
+  const [y, m] = e.month.split('-').map(Number);
+  return `${y}-${pad(m)}-${pad(new Date(Date.UTC(y, m, 0)).getUTCDate())}`;   // ostatni dzień miesiąca
+}
+function evDates(e) {
+  if (!e.start) { const [y, m] = e.month.split('-'); return `${T.months[+m - 1]} ${y}`; }
+  const [ys, ms, ds] = e.start.split('-'), [ye, me, de] = e.end.split('-');
+  if (e.start === e.end) return `${ds}.${ms}.${ys}`;
+  if (ys === ye && ms === me) return `${ds}–${de}.${me}.${ye}`;
+  if (ys === ye) return `${ds}.${ms}–${de}.${me}.${ye}`;
+  return `${ds}.${ms}.${ys}–${de}.${me}.${ye}`;
+}
+function evStatus(e) {
+  if (daysFromToday(evEnd(e)) < 0) return 'ended';
+  if (daysFromToday(evStart(e)) <= 0) return 'now';
+  return 'soon';
+}
+
+function evRow(e) {
+  const st = evStatus(e);
+  const sub = st === 'now' ? T.evNow : st === 'ended' ? T.evEnded : (e.start ? daysLabel(e.start) : T.evTbc);
+  const tags = (st === 'now' ? `<span class="tag new">${esc(T.evNow)}</span>` : '') +
+    tagKind(T.evType1[e.type]) +
+    `<span class="tag ${e.region === 'pl' ? 'mid' : 'lo'}">${esc(e.region === 'pl' ? T.evRegion.pl : T.evRegion.swiat)}</span>` +
+    (e.tbc ? `<span class="tag tbc">${esc(T.evTbc)}</span>` : '');
+  const ics = (!e.tbc && e.start && st !== 'ended') ? `<button type="button" class="btn-ghost" data-ics="${esc(e.id)}">${esc(T.evIcs)}</button>` : '';
+  return `<li class="row ev${st === 'ended' ? ' is-past' : ''}">` +
+    `<div class="r-date">${esc(evDates(e))}<small>${esc(sub)}</small></div>` +
+    `<div class="r-main"><div class="r-tags">${tags}</div>` +
+    `<a class="t" href="${esc(e.url)}" target="_blank" rel="noopener">${esc(evName(e))}</a>` +
+    `<div class="r-meta">${esc(e.city[lang] || e.city.pl)} · ${esc(e.desc[lang] || e.desc.pl)}</div></div>` +
+    `<div class="r-side">${ics}</div></li>`;
+}
+
+function renderEvents() {
+  const box = $('#events');
+  if (!box) return;
+  $('#ev-region').innerHTML = ['all', 'pl', 'swiat'].map(v => `<button type="button" data-v="${v}" aria-pressed="${evState.region === v}">${esc(T.evRegion[v])}</button>`).join('');
+  const visible = EVENTS.filter(e => (evState.region === 'all' || e.region === evState.region) && (evState.past || evStatus(e) !== 'ended'));
+  const counts = {};
+  visible.forEach(e => { counts[e.type] = (counts[e.type] || 0) + 1; });
+  $('#ev-types').innerHTML = `<button type="button" class="chip" data-type="" aria-pressed="${!evState.type}">${esc(T.allCats)}<b>${visible.length}</b></button>` +
+    EV_TYPES.map(t => `<button type="button" class="chip" data-type="${t}" aria-pressed="${evState.type === t}">${esc(T.evTypes[t])}<b>${counts[t] || 0}</b></button>`).join('');
+  $('#n-events').textContent = EVENTS.filter(e => evStatus(e) !== 'ended').length;
+
+  const list = visible.filter(e => !evState.type || e.type === evState.type).sort((a, b) => evStart(a).localeCompare(evStart(b)) || evEnd(a).localeCompare(evEnd(b)));
+  if (!list.length) {
+    box.innerHTML = `<p class="empty">${esc(T.evNone)}</p>`;
+  } else {
+    let html = '', month = '';
+    for (const e of list) {
+      const mo = evStart(e).slice(0, 7);
+      if (mo !== month) {
+        if (month) html += '</ul>';
+        month = mo;
+        html += `<h3 class="month">${esc(T.months[+mo.slice(5, 7) - 1])} ${mo.slice(0, 4)}</h3><ul class="rows">`;
+      }
+      html += evRow(e);
+    }
+    box.innerHTML = html + '</ul>';
+  }
+
+  // zapowiedzi i relacje z mediów (automat, Google News)
+  const media = $('#ev-media');
+  if (!NEWS) media.innerHTML = `<p class="empty">${esc(T.loadingShort)}</p>`;
+  else if (NEWS.error) media.innerHTML = `<p class="empty">${esc(T.newsMissing)}</p>`;
+  else {
+    const items = NEWS.items
+      .filter(it => it.topic === 'wydarzenia' && (evState.region === 'all' || (evState.region === 'pl' ? it.region === 'polska' : it.region === 'swiat')))
+      .sort((a, b) => b.ts - a.ts).slice(0, 40);
+    media.innerHTML = items.length
+      ? `<ul class="rows news">${items.map(it => rowHtml({
+          date: it.date, sub: relTime(it.ts),
+          tags: tagKind(it.outlet) + `<span class="tag ${it.region === 'polska' ? 'mid' : 'lo'}">${esc(it.region === 'polska' ? T.qPoland : T.qWorld)}</span>`,
+          title: it.title, url: it.link, meta: it.summary ? esc(it.summary) : esc(T.viaGN)
+        })).join('')}</ul>`
+      : `<p class="empty">${esc(T.evMediaNone)}</p>`;
+  }
+  reveal($('#s-wydarzenia'));
+}
+
+// Plik .ics (wydarzenie całodniowe) – działa z Google Calendar, Outlookiem i kalendarzem iPhone’a
+function downloadIcs(id) {
+  const e = EVENTS.find(x => x.id === id);
+  if (!e || !e.start) return;
+  const ymdC = s => s.replace(/-/g, '');
+  const [y, m, d] = e.end.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d + 1));                 // DTEND jest wyłączny
+  const endEx = `${t.getUTCFullYear()}${pad(t.getUTCMonth() + 1)}${pad(t.getUTCDate())}`;
+  const escI = s => String(s).replace(/\\/g, '\\\\').replace(/[,;]/g, c => '\\' + c).replace(/\n/g, '\\n');
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Prawo planu//Wydarzenia//PL', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+    `UID:${e.id}@prawoplanu`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${ymdC(e.start)}`, `DTEND;VALUE=DATE:${endEx}`,
+    `SUMMARY:${escI(evName(e))}`, `LOCATION:${escI(e.city[lang] || e.city.pl)}`,
+    `DESCRIPTION:${escI((e.desc[lang] || e.desc.pl) + '\n' + e.url)}`, `URL:${e.url}`, 'END:VEVENT', 'END:VCALENDAR'];
+  const blob = new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${e.id}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
 }
 
 /* ============ ZDJĘCIA I ANIMACJE ============ */
@@ -1544,6 +1785,16 @@ $('#du-cats').addEventListener('click', e => { const b = e.target.closest('.chip
 $('#n-view').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; normsState.view = b.dataset.v; normsState.cat = ''; renderNorms(); });
 $('#n-cats').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; normsState.cat = b.dataset.cat || ''; renderNorms(); });
 $('#nq').addEventListener('input', () => { normsState.q = $('#nq').value; renderNorms(); });
+$('#s-wydarzenia').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.ics) { downloadIcs(b.dataset.ics); return; }
+  if (b.closest('#ev-region')) evState.region = b.dataset.v;
+  else if (b.dataset.type != null) evState.type = b.dataset.type;
+  else return;
+  renderEvents();
+});
+$('#ev-past').addEventListener('change', () => { evState.past = $('#ev-past').checked; renderEvents(); });
 $('#refresh').addEventListener('click', () => { run().catch(fail); loadNews(); });
 $('#s-newsy').addEventListener('click', e => {
   const b = e.target.closest('button');
@@ -1565,6 +1816,7 @@ renderNews();
 loadNews();
 renderNorms();
 loadNorms();
+renderEvents();
 })();
 </script>
 </body>
