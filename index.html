@@ -161,6 +161,36 @@ select{font:inherit;font-size:13.5px;padding:6px 8px;border:1px solid var(--line
 .seg button[aria-pressed="true"]{background:var(--mahogany);color:#FFFFFF}
 .rows.news .r-meta{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px}
 .note{color:var(--mut);font-size:12.5px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+/* pytanie dnia */
+.quiz{border-left:4px solid var(--olive);background-color:var(--sheet);background-image:linear-gradient(rgba(155,152,121,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(155,152,121,.07) 1px,transparent 1px);background-size:16px 16px}
+.quiz-in{padding:18px 20px 14px}
+.qz-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
+.qz-top .lbl{color:var(--moss);font-weight:600}
+.qz-stats{font:500 12px var(--f-mono);color:var(--mut)}
+.qz-q{font:600 clamp(18px,2.1vw,22px)/1.35 var(--f-display);margin:8px 0 14px;max-width:72ch;text-wrap:balance;letter-spacing:-.01em}
+.qz-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.qz-opt{display:flex;gap:12px;align-items:flex-start;text-align:left;font:500 14.5px/1.4 var(--f-body);background:var(--sheet);color:var(--ink);border:1px solid var(--line-strong);border-radius:8px;padding:11px 14px;cursor:pointer;min-width:0;transition:transform .18s cubic-bezier(.2,.7,.2,1),border-color .2s,background-color .2s,box-shadow .2s,opacity .3s}
+.qz-opt .k{flex:none;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--linen);color:var(--mahogany);font:600 12.5px var(--f-mono);transition:background-color .2s,color .2s}
+.qz-opt:hover:not(:disabled){transform:translateY(-2px);border-color:var(--mahogany);box-shadow:0 6px 14px rgba(77,52,45,.12)}
+.qz-opt:hover:not(:disabled) .k{background:var(--mahogany);color:#FFFFFF}
+.qz-opt:disabled{cursor:default}
+.qz-opt.is-ok{background:var(--ok-soft);border-color:var(--ok)}
+.qz-opt.is-ok .k{background:var(--ok);color:#FFFFFF}
+.qz-opt.is-bad{background:var(--hi-soft);border-color:var(--hi)}
+.qz-opt.is-bad .k{background:var(--hi);color:#FFFFFF}
+.qz-opt.is-dim{opacity:.5}
+.qz-res{margin-top:14px;padding:12px 14px;border-radius:8px;background:var(--acc-soft);font-size:14px}
+.qz-res b.v{font-weight:700}
+.qz-res.ok b.v{color:var(--ok)}
+.qz-res.bad b.v{color:var(--hi)}
+.qz-res p{margin:6px 0 0;max-width:80ch}
+.qz-src{font-size:13px;color:var(--mut)}
+.qz-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:12px;font-size:13px;color:var(--mut)}
+.qz-note{margin:12px 0 0;font-size:11.5px;color:var(--mut)}
+@keyframes qzPop{0%{transform:scale(1)}40%{transform:scale(1.035)}100%{transform:scale(1)}}
+.js-anim .qz-opt.is-ok{animation:qzPop .45s ease}
+.js-anim .qz-res{animation:rvIn .4s cubic-bezier(.2,.7,.2,1) both}
+@media (max-width:640px){.qz-opts{grid-template-columns:minmax(0,1fr)}}
 /* wydarzenia */
 #ev-types{padding:4px 0 6px}
 .row.ev{grid-template-columns:10.5rem minmax(0,1fr) auto;align-items:start}
@@ -288,6 +318,10 @@ a.stat:hover b{color:var(--mahogany)}
   <div id="errors"></div>
 
   <div class="stats" id="stats"></div>
+
+  <section class="sheet quiz" id="s-pytanie" data-tab="nowosci" data-nobanner>
+    <div class="quiz-in" id="quiz" aria-live="polite"></div>
+  </section>
 
   <section class="sheet" id="s-nowosci" data-tab="nowosci">
     <div class="sheet-h">
@@ -606,6 +640,302 @@ const EVENTS = [
 ];
 const EV_TYPES = ['targi', 'konferencja', 'festiwal'];
 
+/* ============ PYTANIE DNIA – BAZA PYTAŃ ============ */
+// Poprawna odpowiedź jest zawsze PIERWSZA w tablicy „a” – kolejność na ekranie jest losowana (stała dla danego pytania).
+// Fakty prawne sprawdzone w tekstach jednolitych (XI 2026). Nowe pytanie: dopisz obiekt z unikalnym id.
+const QZ_SRC = {
+  PB:   { pl: 'Prawo budowlane', en: 'Construction Law', url: 'https://dziennikustaw.gov.pl/DU/2026/524' },
+  UPZP: { pl: 'Ustawa o planowaniu i zagospodarowaniu przestrzennym', en: 'Spatial Planning Act', url: 'https://dziennikustaw.gov.pl/DU/2026/538' },
+  PA:   { pl: 'Ustawa o prawie autorskim', en: 'Copyright Act', url: 'https://dziennikustaw.gov.pl/DU/2025/24' },
+  EPBD: { pl: 'Dyrektywa EPBD 2024/1275', en: 'EPBD Directive 2024/1275', url: 'https://eur-lex.europa.eu/eli/dir/2024/1275/oj' }
+};
+const QUIZ = [
+  // ---- Prawo budowlane ----
+  { id: 'p01', cat: 'prawo', src: ['PB', 'art. 82'],
+    q: { pl: 'Który organ co do zasady wydaje pozwolenie na budowę w pierwszej instancji?', en: 'Which authority, as a rule, issues building permits at first instance?' },
+    a: [{ pl: 'Starosta', en: 'The starosta (county head)' },
+        { pl: 'Wójt lub burmistrz', en: 'The commune head or mayor' },
+        { pl: 'Wojewoda', en: 'The voivode' },
+        { pl: 'Główny Inspektor Nadzoru Budowlanego', en: 'The Chief Building Control Inspector' }],
+    e: { pl: 'Organem administracji architektoniczno-budowlanej pierwszej instancji jest starosta (w miastach na prawach powiatu jego zadania wykonuje prezydent miasta). Wojewoda wydaje pozwolenia tylko dla obiektów wymienionych w ustawie.', en: 'The starosta is the first-instance architectural and building authority (in cities with county rights – the city mayor). The voivode handles only objects listed in the Act.' } },
+  { id: 'p02', cat: 'prawo', src: ['PB', 'art. 35 ust. 6'],
+    q: { pl: 'Ile czasu ma organ na wydanie decyzji o pozwoleniu na budowę od złożenia wniosku?', en: 'How long does the authority have to decide on a building permit application?' },
+    a: [{ pl: '65 dni', en: '65 days' }, { pl: '30 dni', en: '30 days' }, { pl: '45 dni', en: '45 days' }, { pl: '90 dni', en: '90 days' }],
+    e: { pl: 'Jeśli organ nie wyda decyzji w ciągu 65 dni, organ wyższego stopnia nakłada na niego karę za każdy dzień zwłoki.', en: 'If no decision is issued within 65 days, the higher authority fines the office for each day of delay.' } },
+  { id: 'p03', cat: 'prawo', src: ['PB', 'art. 30 ust. 5'],
+    q: { pl: 'W jakim terminie organ może wnieść sprzeciw do zgłoszenia robót budowlanych?', en: 'Within what period can the authority object to a notification of building works?' },
+    a: [{ pl: '21 dni', en: '21 days' }, { pl: '14 dni', en: '14 days' }, { pl: '30 dni', en: '30 days' }, { pl: '65 dni', en: '65 days' }],
+    e: { pl: 'Termin liczy się od dnia doręczenia zgłoszenia. Brak sprzeciwu w ciągu 21 dni oznacza tzw. milczącą zgodę – można rozpocząć roboty.', en: 'The period runs from delivery of the notification. No objection within 21 days means tacit consent – the works may start.' } },
+  { id: 'p04', cat: 'prawo', src: ['PB', 'art. 37 ust. 1'],
+    q: { pl: 'Pozwolenie na budowę wygasa, jeśli budowy nie rozpoczęto w ciągu:', en: 'A building permit expires if construction has not started within:' },
+    a: [{ pl: '3 lat', en: '3 years' }, { pl: '1 roku', en: '1 year' }, { pl: '2 lat', en: '2 years' }, { pl: '5 lat', en: '5 years' }],
+    e: { pl: 'Termin 3 lat liczy się od dnia, w którym decyzja stała się ostateczna, a przerwa w budowie też nie może przekroczyć 3 lat.', en: 'The 3 years run from the day the decision became final; a break in construction also cannot exceed 3 years.' } },
+  { id: 'p05', cat: 'prawo', src: ['PB', 'art. 41 ust. 1'],
+    q: { pl: 'Z jaką chwilą następuje rozpoczęcie budowy?', en: 'When does construction legally start?' },
+    a: [{ pl: 'Z chwilą podjęcia prac przygotowawczych', en: 'When preparatory works begin on site' },
+        { pl: 'Z chwilą wydania pozwolenia na budowę', en: 'When the building permit is issued' },
+        { pl: 'Po wykonaniu fundamentów', en: 'Once the foundations are completed' },
+        { pl: 'Po wpisie kierownika budowy do dziennika', en: 'When the site manager signs the site log' }],
+    e: { pl: 'Ustawa wiąże rozpoczęcie budowy z pracami przygotowawczymi – ma to znaczenie m.in. dla terminu ważności pozwolenia.', en: 'The Act links the start of construction to preparatory works – which matters e.g. for permit validity.' } },
+  { id: 'p06', cat: 'prawo', src: ['PB', 'art. 41 ust. 2'],
+    q: { pl: 'Która czynność jest pracą przygotowawczą na terenie budowy?', en: 'Which of these counts as a preparatory work on a construction site?' },
+    a: [{ pl: 'Wytyczenie geodezyjne obiektów w terenie', en: 'Geodetic setting-out of the buildings on site' },
+        { pl: 'Zakup materiałów budowlanych', en: 'Buying building materials' },
+        { pl: 'Podpisanie umowy z wykonawcą', en: 'Signing the contract with the builder' },
+        { pl: 'Uzyskanie warunków przyłączenia do sieci', en: 'Obtaining utility connection conditions' }],
+    e: { pl: 'Pracami przygotowawczymi są: wytyczenie geodezyjne, niwelacja terenu, zagospodarowanie terenu budowy i wykonanie przyłączy na potrzeby budowy.', en: 'Preparatory works are: geodetic setting-out, levelling, site set-up and utility connections for the works.' } },
+  { id: 'p07', cat: 'prawo', src: ['PB', 'art. 28 ust. 2'],
+    q: { pl: 'Kto oprócz inwestora jest stroną postępowania o pozwolenie na budowę?', en: 'Besides the investor, who is a party to building permit proceedings?' },
+    a: [{ pl: 'Właściciele i zarządcy nieruchomości w obszarze oddziaływania obiektu', en: 'Owners and managers of property in the building’s impact area' },
+        { pl: 'Wszyscy mieszkańcy gminy, w której ma powstać obiekt', en: 'All residents of the commune where the building will stand' },
+        { pl: 'Tylko właściciele działek bezpośrednio graniczących z działką inwestora', en: 'Only owners of plots directly adjoining the investor’s plot' },
+        { pl: 'Projektant, kierownik budowy i inspektor nadzoru inwestorskiego', en: 'The designer, the site manager and the investor’s supervisor' }],
+    e: { pl: 'Stronami są właściciele, użytkownicy wieczyści lub zarządcy nieruchomości w obszarze oddziaływania obiektu – decyduje ten obszar, a nie sama odległość od działki.', en: 'Parties are owners, perpetual usufructuaries or managers of property in the impact area – the area decides, not just distance.' } },
+  { id: 'p08', cat: 'prawo', src: ['PB', 'art. 3 pkt 20'],
+    q: { pl: 'Obszar oddziaływania obiektu wyznacza się na podstawie:', en: 'The impact area of a building is determined on the basis of:' },
+    a: [{ pl: 'Przepisów odrębnych ograniczających zagospodarowanie terenu', en: 'Separate regulations restricting land development' },
+        { pl: 'Uznania inwestora i projektanta wyrażonego w projekcie', en: 'The investor’s and designer’s judgement stated in the design' },
+        { pl: 'Stałej odległości 100 m od granic działki inwestora', en: 'A fixed 100 m distance from the investor’s plot boundaries' },
+        { pl: 'Opinii sąsiadów zebranych przez organ w postępowaniu', en: 'Neighbours’ opinions gathered by the authority' }],
+    e: { pl: 'To teren w otoczeniu obiektu, na którym przepisy odrębne (np. o odległościach, nasłonecznieniu, ochronie ppoż.) wprowadzają ograniczenia związane z tym obiektem.', en: 'It is the surrounding land where separate rules (distances, daylight, fire safety…) impose restrictions caused by the building.' } },
+  { id: 'p09', cat: 'prawo', src: ['PB', 'art. 34 ust. 3'],
+    q: { pl: 'Z jakich części składa się projekt budowlany od reformy z 2020 r.?', en: 'Since the 2020 reform, what parts make up a building design?' },
+    a: [{ pl: 'Projekt zagospodarowania terenu, architektoniczno-budowlany i techniczny', en: 'Site plan, architectural-construction design and technical design' },
+        { pl: 'Projekt koncepcyjny, projekt wykonawczy i projekt powykonawczy', en: 'Concept design, construction design and as-built design' },
+        { pl: 'Inwentaryzacja budowlana, projekt wielobranżowy i kosztorys', en: 'Building survey, multi-discipline design and cost estimate' },
+        { pl: 'Część rysunkowa, część opisowa i część obliczeniowa', en: 'Drawings part, description part and calculations part' }],
+    e: { pl: 'Reforma z 2020 r. podzieliła projekt budowlany na trzy części o różnym zakresie i znaczeniu formalnym.', en: 'The 2020 reform split the building design into three parts with different scope and legal role.' } },
+  { id: 'p10', cat: 'prawo', src: ['PB', 'art. 33–35'],
+    q: { pl: 'Której części projektu budowlanego organ nie zatwierdza w decyzji o pozwoleniu na budowę?', en: 'Which part of the building design is NOT approved in the building permit decision?' },
+    a: [{ pl: 'Projektu technicznego', en: 'The technical design' }, { pl: 'Projektu zagospodarowania działki lub terenu', en: 'The site development plan' },
+        { pl: 'Projektu architektoniczno-budowlanego', en: 'The architectural-construction design' }, { pl: 'Organ zatwierdza wszystkie części', en: 'The authority approves all parts' }],
+    e: { pl: 'Do wniosku dołącza się projekt zagospodarowania i projekt architektoniczno-budowlany. Projekt techniczny nie podlega zatwierdzeniu – musi być gotowy przed rozpoczęciem robót.', en: 'The application includes the site plan and the architectural-construction design. The technical design is not approved but must be ready before works start.' } },
+  { id: 'p11', cat: 'prawo', src: ['PB', 'art. 29 ust. 1 pkt 1a'],
+    q: { pl: 'Do jakiej powierzchni zabudowy wolnostojący dom jednorodzinny (do 2 kondygnacji, na własne potrzeby) można budować na zgłoszenie?', en: 'Up to what footprint can a detached single-family house (max 2 storeys, own housing needs) be built on notification only?' },
+    a: [{ pl: '70 m²', en: '70 m²' }, { pl: '35 m²', en: '35 m²' }, { pl: '50 m²', en: '50 m²' }, { pl: '100 m²', en: '100 m²' }],
+    e: { pl: 'Warunkiem jest też, by obszar oddziaływania domu mieścił się w całości na działce lub działkach inwestora.', en: 'The house’s impact area must also fit entirely within the investor’s plot(s).' } },
+  { id: 'p12', cat: 'prawo', src: ['PB', 'art. 49f'],
+    q: { pl: 'Po ilu latach od zakończenia budowy samowolę budowlaną można zalegalizować w trybie uproszczonym?', en: 'How many years after completion can an unauthorised building be legalised in the simplified procedure?' },
+    a: [{ pl: 'Co najmniej 20 latach', en: 'At least 20 years' }, { pl: 'Co najmniej 5 latach', en: 'At least 5 years' }, { pl: 'Co najmniej 10 latach', en: 'At least 10 years' }, { pl: 'Co najmniej 30 latach', en: 'At least 30 years' }],
+    e: { pl: 'Uproszczone postępowanie legalizacyjne wprowadzono w 2020 r. – dotyczy obiektów, od których zakończenia budowy upłynęło co najmniej 20 lat.', en: 'The simplified legalisation procedure, introduced in 2020, covers buildings completed at least 20 years ago.' } },
+  { id: 'p13', cat: 'prawo', src: ['PB', 'art. 54'],
+    q: { pl: 'Po zawiadomieniu o zakończeniu budowy można przystąpić do użytkowania, jeśli organ nie zgłosi sprzeciwu w terminie:', en: 'After notifying completion, you may start using the building if the authority does not object within:' },
+    a: [{ pl: '14 dni', en: '14 days' }, { pl: '7 dni', en: '7 days' }, { pl: '21 dni', en: '21 days' }, { pl: '30 dni', en: '30 days' }],
+    e: { pl: 'Zawiadomienie składa się do organu nadzoru budowlanego; dla niektórych obiektów zamiast tego wymagane jest pozwolenie na użytkowanie.', en: 'The notice goes to the building control authority; some buildings need an occupancy permit instead.' } },
+  { id: 'p14', cat: 'prawo', src: ['PB', 'art. 62 ust. 1 pkt 2'],
+    q: { pl: 'Jak często przeprowadza się kontrolę stanu technicznego i przydatności do użytkowania obiektu, jego estetyki i otoczenia?', en: 'How often must a building’s technical condition, fitness for use, appearance and surroundings be inspected?' },
+    a: [{ pl: 'Co najmniej raz na 5 lat', en: 'At least once every 5 years' }, { pl: 'Co najmniej raz w roku', en: 'At least once a year' }, { pl: 'Co 10 lat', en: 'Every 10 years' }, { pl: 'Tylko przy sprzedaży budynku', en: 'Only when the building is sold' }],
+    e: { pl: 'Kontrola pięcioletnia obejmuje też badanie instalacji elektrycznej i piorunochronnej.', en: 'The five-year inspection also covers the electrical and lightning protection systems.' } },
+  { id: 'p15', cat: 'prawo', src: ['PB', 'art. 62 ust. 1 pkt 1'],
+    q: { pl: 'Instalacje gazowe i przewody kominowe w budynku kontroluje się co najmniej:', en: 'Gas installations and chimney flues must be inspected at least:' },
+    a: [{ pl: 'Raz w roku', en: 'Once a year' }, { pl: 'Raz na 2 lata', en: 'Once every 2 years' }, { pl: 'Raz na 5 lat', en: 'Once every 5 years' }, { pl: 'Raz na 10 lat', en: 'Once every 10 years' }],
+    e: { pl: 'Coroczna kontrola obejmuje elementy narażone na szkodliwe wpływy atmosferyczne, instalacje ochrony środowiska oraz instalacje gazowe i przewody kominowe.', en: 'The annual check covers weather-exposed elements, environmental installations, gas installations and flues.' } },
+  { id: 'p16', cat: 'prawo', src: ['PB', 'art. 80 i 83'],
+    q: { pl: 'Który organ jest organem nadzoru budowlanego pierwszej instancji?', en: 'Which body is the first-instance building control authority?' },
+    a: [{ pl: 'Powiatowy inspektor nadzoru budowlanego', en: 'The county building control inspector' }, { pl: 'Starosta – wydział architektury i budownictwa', en: 'The starosta – architecture and building department' },
+        { pl: 'Wojewódzki inspektor nadzoru budowlanego', en: 'The regional building control inspector' }, { pl: 'Główny Inspektor Nadzoru Budowlanego', en: 'The Chief Building Control Inspector' }],
+    e: { pl: 'Administracja architektoniczno-budowlana (starosta) wydaje pozwolenia, a nadzór budowlany kontroluje budowy i użytkowanie obiektów: w I instancji powiatowy inspektor (PINB), w II – wojewódzki (WINB).', en: 'Architectural administration (starosta) issues permits; building control supervises works and use: the county inspector at first instance, the regional one at second.' } },
+  { id: 'p17', cat: 'prawo', src: ['PB', 'art. 3 pkt 2'],
+    q: { pl: 'Według Prawa budowlanego budynek to obiekt trwale związany z gruntem, wydzielony przegrodami budowlanymi oraz posiadający:', en: 'Under the Construction Law, a building is a structure permanently attached to the ground, enclosed by partitions and having:' },
+    a: [{ pl: 'Fundamenty i dach', en: 'Foundations and a roof' }, { pl: 'Co najmniej dwie kondygnacje', en: 'At least two storeys' },
+        { pl: 'Instalację wodno-kanalizacyjną', en: 'Water and sewage installations' }, { pl: 'Ściany murowane', en: 'Masonry walls' }],
+    e: { pl: 'Definicja budynku ma znaczenie m.in. przy kwalifikowaniu robót i wyborze trybu (pozwolenie czy zgłoszenie).', en: 'The definition matters e.g. when classifying works and choosing the procedure (permit or notification).' } },
+  { id: 'p18', cat: 'prawo', src: ['PB', 'art. 3 pkt 5'],
+    q: { pl: 'Tymczasowy obiekt budowlany to obiekt przeznaczony do użytkowania w okresie:', en: 'A temporary structure is one intended for use for a period:' },
+    a: [{ pl: 'Krótszym od jego trwałości technicznej', en: 'Shorter than its technical durability' },
+        { pl: 'Nie dłuższym niż 30 dni od dnia ustawienia na działce', en: 'Of no more than 30 days from placing it on the plot' },
+        { pl: 'Do czasu zakończenia budowy sąsiedniego budynku', en: 'Until construction of the neighbouring building ends' },
+        { pl: 'Nie dłuższym niż 10 lat od uzyskania pozwolenia', en: 'Of no more than 10 years from obtaining the permit' }],
+    e: { pl: 'Taki obiekt jest przewidziany do przeniesienia w inne miejsce lub rozbiórki. Ustawa nie podaje sztywnego terminu – liczy się przeznaczenie do czasowego użytkowania.', en: 'Such a structure is meant to be moved or demolished. The Act sets no fixed term – what counts is intended temporary use.' } },
+  { id: 'p19', cat: 'prawo', src: ['PB', 'art. 3 pkt 8'],
+    q: { pl: 'Remont w rozumieniu Prawa budowlanego to roboty polegające na:', en: 'Under the Construction Law, “renovation” means works consisting of:' },
+    a: [{ pl: 'Odtworzeniu stanu pierwotnego, niestanowiące bieżącej konserwacji', en: 'Restoring the original condition, other than routine maintenance' },
+        { pl: 'Zmianie parametrów obiektu, np. wysokości lub kubatury', en: 'Changing the building’s parameters, e.g. height or volume' },
+        { pl: 'Dobudowie nowej kondygnacji lub skrzydła budynku', en: 'Adding a new storey or wing to the building' },
+        { pl: 'Rozbiórce obiektu i postawieniu nowego w tym miejscu', en: 'Demolishing the building and erecting a new one' }],
+    e: { pl: 'Przy remoncie wolno stosować wyroby budowlane inne niż użyte w stanie pierwotnym. Zmiana parametrów to już przebudowa lub rozbudowa.', en: 'Renovation may use different building products than originally. Changing parameters is alteration or extension.' } },
+  { id: 'p20', cat: 'prawo', src: ['PB', 'art. 71 ust. 2'],
+    q: { pl: 'Zmiana sposobu użytkowania obiektu lub jego części wymaga co do zasady:', en: 'A change of use of a building (or part of it) generally requires:' },
+    a: [{ pl: 'Zgłoszenia organowi administracji architektoniczno-budowlanej', en: 'A notification to the architectural-building authority' },
+        { pl: 'Uzyskania nowego pozwolenia na budowę dla całego obiektu', en: 'A new building permit for the whole building' },
+        { pl: 'Pisemnej zgody właścicieli wszystkich sąsiednich działek', en: 'Written consent from all neighbouring plot owners' },
+        { pl: 'Niczego – to wyłączna decyzja właściciela obiektu', en: 'Nothing – it is solely the owner’s decision' }],
+    e: { pl: 'W zgłoszeniu określa się dotychczasowy i zamierzony sposób użytkowania; organ może wnieść sprzeciw.', en: 'The notice states the current and intended use; the authority may object.' } },
+  { id: 'p21', cat: 'zawod', src: ['PB', 'art. 12'],
+    q: { pl: 'Kto nadaje uprawnienia budowlane w specjalności architektonicznej?', en: 'Who grants building qualifications in the architectural specialty?' },
+    a: [{ pl: 'Izba architektów – organ samorządu zawodowego', en: 'The chamber of architects – the professional self-government body' },
+        { pl: 'Minister właściwy do spraw budownictwa', en: 'The minister responsible for construction' }, { pl: 'Uczelnia po studiach architektonicznych', en: 'The university after an architecture degree' }, { pl: 'Główny Urząd Nadzoru Budowlanego', en: 'The Chief Building Control Office' }],
+    e: { pl: 'Uprawnienia nadają organy samorządu zawodowego po praktyce zawodowej i egzaminie.', en: 'Qualifications are granted by professional self-government bodies after practice and an exam.' } },
+  { id: 'p22', cat: 'zawod', src: ['PB', 'art. 12'],
+    q: { pl: 'Co poza uprawnieniami budowlanymi jest potrzebne, by samodzielnie projektować?', en: 'Besides building qualifications, what is required to practise as a designer?' },
+    a: [{ pl: 'Przynależność do właściwej izby samorządu zawodowego', en: 'Membership of the relevant professional chamber' },
+        { pl: 'Tytuł doktora w dyscyplinie architektura i urbanistyka', en: 'A doctorate in architecture and urban planning' },
+        { pl: 'Prowadzenie własnej działalności gospodarczej', en: 'Running your own registered business' },
+        { pl: 'Co najmniej 10 lat praktyki zawodowej na budowie', en: 'At least 10 years of on-site professional practice' }],
+    e: { pl: 'Podstawą wykonywania samodzielnej funkcji technicznej jest wpis do centralnego rejestru i ważne zaświadczenie z izby (z ubezpieczeniem OC).', en: 'Practice requires entry in the central register and a valid chamber certificate (including liability insurance).' } },
+  { id: 'p23', cat: 'prawo',
+    q: { pl: 'Czym jest c-KOB?', en: 'What is c-KOB?' },
+    a: [{ pl: 'Cyfrową książką obiektu budowlanego prowadzoną w systemie GUNB', en: 'The digital building logbook run in the GUNB system' },
+        { pl: 'Centralnym katalogiem obiektów w księgach wieczystych', en: 'A central catalogue of buildings in land registers' }, { pl: 'Certyfikatem kompetencji budowlanych', en: 'A construction skills certificate' }, { pl: 'Rejestrem kierowników budowy', en: 'A register of site managers' }],
+    e: { pl: 'Od 2023 r. książkę obiektu budowlanego prowadzi się elektronicznie w systemie c-KOB udostępnionym przez Główny Urząd Nadzoru Budowlanego.', en: 'Since 2023 the building logbook is kept electronically in c-KOB, provided by the Chief Building Control Office.' } },
+  { id: 'p24', cat: 'prawo',
+    q: { pl: 'Przez jaki portal GUNB złożysz online m.in. wniosek o pozwolenie na budowę?', en: 'Which GUNB portal lets you file e.g. a building permit application online?' },
+    a: [{ pl: 'e-Budownictwo', en: 'e-Budownictwo' }, { pl: 'Geoportal', en: 'Geoportal' }, { pl: 'e-Urząd Skarbowy', en: 'e-Urząd Skarbowy (tax portal)' }, { pl: 'CEIDG', en: 'CEIDG (business register)' }],
+    e: { pl: 'Portal e-Budownictwo prowadzony przez GUNB umożliwia składanie wniosków, zgłoszeń i zawiadomień budowlanych przez internet.', en: 'The e-Budownictwo portal run by GUNB lets you file building applications and notifications online.' } },
+  // ---- Planowanie przestrzenne ----
+  { id: 'l01', cat: 'planowanie', src: ['UPZP', 'art. 13a'],
+    q: { pl: 'Który dokument zastąpił studium uwarunkowań i kierunków zagospodarowania przestrzennego gminy?', en: 'Which document replaced the municipal “study of conditions and directions of spatial development”?' },
+    a: [{ pl: 'Plan ogólny gminy', en: 'The general municipal plan' }, { pl: 'Miejscowy plan zagospodarowania przestrzennego', en: 'The local zoning plan' },
+        { pl: 'Decyzja o warunkach zabudowy', en: 'The zoning decision (WZ)' }, { pl: 'Audyt krajobrazowy', en: 'The landscape audit' }],
+    e: { pl: 'Reforma planowania z 2023 r. wprowadziła plan ogólny, który – w przeciwieństwie do studium – jest aktem prawa miejscowego.', en: 'The 2023 planning reform introduced the general plan which, unlike the study, is an act of local law.' } },
+  { id: 'l02', cat: 'planowanie', src: ['UPZP', 'art. 14 ust. 8'],
+    q: { pl: 'Miejscowy plan zagospodarowania przestrzennego jest:', en: 'A local zoning plan is:' },
+    a: [{ pl: 'Aktem prawa miejscowego', en: 'An act of local law' }, { pl: 'Decyzją administracyjną', en: 'An administrative decision' },
+        { pl: 'Umową gminy z inwestorem', en: 'A contract between the commune and an investor' }, { pl: 'Niewiążącą wytyczną', en: 'A non-binding guideline' }],
+    e: { pl: 'Plan miejscowy wiąże wszystkich – organ wydający pozwolenie na budowę sprawdza zgodność projektu z jego ustaleniami.', en: 'The local plan binds everyone – the permit authority checks the design’s compliance with it.' } },
+  { id: 'l03', cat: 'planowanie', src: ['UPZP', 'art. 20'],
+    q: { pl: 'Kto uchwala miejscowy plan zagospodarowania przestrzennego?', en: 'Who adopts the local zoning plan?' },
+    a: [{ pl: 'Rada gminy', en: 'The municipal council' }, { pl: 'Wójt, burmistrz albo prezydent miasta', en: 'The commune head or city mayor' },
+        { pl: 'Starosta', en: 'The starosta' }, { pl: 'Wojewoda', en: 'The voivode' }],
+    e: { pl: 'Projekt planu przygotowuje wójt (burmistrz, prezydent), a uchwala go rada gminy; wojewoda bada potem zgodność uchwały z prawem.', en: 'The mayor prepares the draft, the council adopts it, and the voivode then reviews its legality.' } },
+  { id: 'l04', cat: 'planowanie', src: ['UPZP', 'art. 37ea'],
+    q: { pl: 'Czym jest zintegrowany plan inwestycyjny (ZPI)?', en: 'What is an integrated investment plan (ZPI)?' },
+    a: [{ pl: 'Szczególnym planem miejscowym uchwalanym przez radę gminy na wniosek inwestora', en: 'A special local plan adopted by the council at an investor’s request' },
+        { pl: 'Wewnętrznym planem finansowym inwestora zatwierdzanym przez bank', en: 'An investor’s internal financial plan approved by a bank' },
+        { pl: 'Decyzją wojewody o lokalizacji inwestycji celu publicznego', en: 'A voivode’s decision on a public-purpose investment' },
+        { pl: 'Harmonogramem robót dołączanym do dziennika budowy', en: 'A works schedule attached to the site log' }],
+    e: { pl: 'ZPI wprowadziła reforma z 2023 r. Inwestor składa wniosek przez wójta (burmistrza), a z gminą zawiera umowę urbanistyczną.', en: 'Introduced by the 2023 reform: the investor applies via the mayor and signs an urban planning agreement with the commune.' } },
+  { id: 'l05', cat: 'planowanie', src: ['UPZP', 'art. 13a'],
+    q: { pl: 'Kto uchwala plan ogólny gminy?', en: 'Who adopts the general municipal plan?' },
+    a: [{ pl: 'Rada gminy', en: 'The municipal council' }, { pl: 'Wójt lub burmistrz', en: 'The commune head or mayor' }, { pl: 'Sejmik województwa', en: 'The regional assembly' }, { pl: 'Minister właściwy do spraw budownictwa', en: 'The construction minister' }],
+    e: { pl: 'Plan ogólny obejmuje cały obszar gminy (poza nielicznymi wyjątkami) i wyznacza m.in. strefy planistyczne.', en: 'The general plan covers the whole commune (with few exceptions) and sets planning zones.' } },
+  // ---- Prawo autorskie, UE ----
+  { id: 'z01', cat: 'zawod', src: ['PA', 'art. 16'],
+    q: { pl: 'Autorskie prawa osobiste architekta do projektu:', en: 'An architect’s moral rights to a design:' },
+    a: [{ pl: 'Nie podlegają zrzeczeniu się ani zbyciu', en: 'Cannot be waived or transferred' }, { pl: 'Można sprzedać razem z prawami majątkowymi', en: 'Can be sold with the economic rights' },
+        { pl: 'Wygasają po 20 latach', en: 'Expire after 20 years' }, { pl: 'Przechodzą na inwestora po odbiorze budynku', en: 'Pass to the investor at handover' }],
+    e: { pl: 'Zbyć można autorskie prawa majątkowe (np. licencja lub przeniesienie praw). Prawa osobiste – m.in. do autorstwa i nienaruszalności dzieła – zostają przy twórcy.', en: 'Economic rights can be transferred or licensed; moral rights (authorship, integrity) stay with the author.' } },
+  { id: 'z02', cat: 'ue', src: ['EPBD', 'art. 7'],
+    q: { pl: 'Od kiedy według dyrektywy EPBD wszystkie nowe budynki mają być zeroemisyjne?', en: 'Under the EPBD, from when must all new buildings be zero-emission?' },
+    a: [{ pl: 'Od 2030 r.', en: 'From 2030' }, { pl: 'Od 2026 r.', en: 'From 2026' }, { pl: 'Od 2035 r.', en: 'From 2035' }, { pl: 'Od 2050 r.', en: 'From 2050' }],
+    e: { pl: 'Nowe budynki należące do instytucji publicznych – od 2028 r., wszystkie nowe budynki – od 2030 r.', en: 'New public buildings – from 2028; all new buildings – from 2030.' } },
+  // ---- Architektura i urbanistyka ----
+  { id: 'a01', cat: 'architektura', q: { pl: 'Kto sformułował „pięć punktów nowej architektury” (słupy, wolny plan, wolna elewacja, okno wstęgowe, ogród na dachu)?', en: 'Who formulated the “five points of a new architecture” (pilotis, free plan, free façade, ribbon window, roof garden)?' },
+    a: [{ pl: 'Le Corbusier', en: 'Le Corbusier' }, { pl: 'Walter Gropius', en: 'Walter Gropius' }, { pl: 'Frank Lloyd Wright', en: 'Frank Lloyd Wright' }, { pl: 'Adolf Loos', en: 'Adolf Loos' }],
+    e: { pl: 'Najpełniej zrealizował je w Willi Savoye w Poissy (1931).', en: 'Most fully realised in the Villa Savoye in Poissy (1931).' } },
+  { id: 'a02', cat: 'architektura', q: { pl: 'Hasło „Less is more” kojarzone jest przede wszystkim z:', en: 'The motto “Less is more” is mainly associated with:' },
+    a: [{ pl: 'Ludwigiem Miesem van der Rohe', en: 'Ludwig Mies van der Rohe' }, { pl: 'Le Corbusierem', en: 'Le Corbusier' }, { pl: 'Robertem Venturim', en: 'Robert Venturi' }, { pl: 'Frankiem Gehrym', en: 'Frank Gehry' }],
+    e: { pl: 'Mies spopularyzował to hasło; postmodernista Robert Venturi odpowiedział przekornie: „Less is a bore”.', en: 'Mies popularised it; the postmodernist Robert Venturi replied: “Less is a bore”.' } },
+  { id: 'a03', cat: 'architektura', q: { pl: 'Zasadę „form follows function” (forma wynika z funkcji) sformułował:', en: 'The principle “form follows function” was coined by:' },
+    a: [{ pl: 'Louis Sullivan', en: 'Louis Sullivan' }, { pl: 'Antoni Gaudí', en: 'Antoni Gaudí' }, { pl: 'Andrea Palladio', en: 'Andrea Palladio' }, { pl: 'Rem Koolhaas', en: 'Rem Koolhaas' }],
+    e: { pl: 'Sullivan, pionier wieżowców w Chicago, napisał „form ever follows function” w 1896 r.', en: 'Sullivan, a Chicago skyscraper pioneer, wrote “form ever follows function” in 1896.' } },
+  { id: 'a04', cat: 'architektura', q: { pl: 'Kto założył szkołę Bauhaus w 1919 r. w Weimarze?', en: 'Who founded the Bauhaus school in Weimar in 1919?' },
+    a: [{ pl: 'Walter Gropius', en: 'Walter Gropius' }, { pl: 'Ludwig Mies van der Rohe', en: 'Ludwig Mies van der Rohe' }, { pl: 'Marcel Breuer', en: 'Marcel Breuer' }, { pl: 'Le Corbusier', en: 'Le Corbusier' }],
+    e: { pl: 'Bauhaus działał kolejno w Weimarze, Dessau i Berlinie; Mies van der Rohe był jego ostatnim dyrektorem.', en: 'The Bauhaus moved from Weimar to Dessau and Berlin; Mies van der Rohe was its last director.' } },
+  { id: 'a05', cat: 'architektura', q: { pl: 'Pierwszym laureatem Nagrody Pritzkera (1979) był:', en: 'The first Pritzker Prize laureate (1979) was:' },
+    a: [{ pl: 'Philip Johnson', en: 'Philip Johnson' }, { pl: 'Oscar Niemeyer', en: 'Oscar Niemeyer' }, { pl: 'Kenzo Tange', en: 'Kenzo Tange' }, { pl: 'Frank Gehry', en: 'Frank Gehry' }],
+    e: { pl: 'Nagroda Pritzkera bywa nazywana „architektonicznym Noblem”. Tange otrzymał ją w 1987, Niemeyer w 1988, a Gehry w 1989 r.', en: 'Often called the “Nobel of architecture”. Tange won in 1987, Niemeyer in 1988, Gehry in 1989.' } },
+  { id: 'a06', cat: 'architektura', q: { pl: 'Pierwszą kobietą nagrodzoną Nagrodą Pritzkera (2004) była:', en: 'The first woman to win the Pritzker Prize (2004) was:' },
+    a: [{ pl: 'Zaha Hadid', en: 'Zaha Hadid' }, { pl: 'Kazuyo Sejima', en: 'Kazuyo Sejima' }, { pl: 'Anne Lacaton', en: 'Anne Lacaton' }, { pl: 'Carme Pigem', en: 'Carme Pigem' }],
+    e: { pl: 'Kolejne laureatki to m.in. Kazuyo Sejima (2010, z Ryue Nishizawą), Carme Pigem (2017, RCR) i Anne Lacaton (2021).', en: 'Later laureates include Kazuyo Sejima (2010), Carme Pigem (2017, RCR) and Anne Lacaton (2021).' } },
+  { id: 'a07', cat: 'architektura', q: { pl: 'Pałac Kultury i Nauki w Warszawie zaprojektował:', en: 'The Palace of Culture and Science in Warsaw was designed by:' },
+    a: [{ pl: 'Lew Rudniew', en: 'Lev Rudnev' }, { pl: 'Bohdan Pniewski', en: 'Bohdan Pniewski' }, { pl: 'Józef Sigalin', en: 'Józef Sigalin' }, { pl: 'Borys Iofan', en: 'Boris Iofan' }],
+    e: { pl: 'Radziecki architekt Lew Rudniew; budowa trwała w latach 1952–1955.', en: 'Soviet architect Lev Rudnev; built in 1952–1955.' } },
+  { id: 'a08', cat: 'architektura', q: { pl: 'Witruwiusz opisał trzy zasady architektury: firmitas, utilitas i…', en: 'Vitruvius named three principles of architecture: firmitas, utilitas and…' },
+    a: [{ pl: 'venustas', en: 'venustas' }, { pl: 'gravitas', en: 'gravitas' }, { pl: 'veritas', en: 'veritas' }, { pl: 'modernitas', en: 'modernitas' }],
+    e: { pl: 'Trwałość, użyteczność i piękno – triada z traktatu „O architekturze ksiąg dziesięć”.', en: 'Durability, utility and beauty – from “The Ten Books on Architecture”.' } },
+  { id: 'a09', cat: 'architektura', q: { pl: 'Dom nad wodospadem (Fallingwater) w Pensylwanii zaprojektował:', en: 'Fallingwater in Pennsylvania was designed by:' },
+    a: [{ pl: 'Frank Lloyd Wright', en: 'Frank Lloyd Wright' }, { pl: 'Richard Neutra', en: 'Richard Neutra' }, { pl: 'Philip Johnson', en: 'Philip Johnson' }, { pl: 'Louis Kahn', en: 'Louis Kahn' }],
+    e: { pl: 'Ikona architektury organicznej – dom zawieszony nad strumieniem Bear Run.', en: 'An icon of organic architecture, cantilevered over Bear Run stream.' } },
+  { id: 'a10', cat: 'architektura', q: { pl: 'Bazylika Sagrada Família w Barcelonie to dzieło:', en: 'The Sagrada Família in Barcelona is the work of:' },
+    a: [{ pl: 'Antoniego Gaudíego', en: 'Antoni Gaudí' }, { pl: 'Santiago Calatravy', en: 'Santiago Calatrava' }, { pl: 'Ricarda Bofilla', en: 'Ricardo Bofill' }, { pl: 'Lluísa Domènecha i Montanera', en: 'Lluís Domènech i Montaner' }],
+    e: { pl: 'Gaudí pracował nad nią od 1883 r. aż do śmierci w 1926 r.; budowa trwa do dziś.', en: 'Gaudí worked on it from 1883 until his death in 1926; construction continues today.' } },
+  { id: 'a11', cat: 'architektura', q: { pl: 'Centre Pompidou w Paryżu zaprojektowali:', en: 'The Centre Pompidou in Paris was designed by:' },
+    a: [{ pl: 'Renzo Piano i Richard Rogers', en: 'Renzo Piano and Richard Rogers' }, { pl: 'Jean Nouvel i Philippe Starck', en: 'Jean Nouvel and Philippe Starck' },
+        { pl: 'Norman Foster i Richard Rogers', en: 'Norman Foster and Richard Rogers' }, { pl: 'Herzog & de Meuron', en: 'Herzog & de Meuron' }],
+    e: { pl: 'Ikona high-techu (1977) – instalacje i konstrukcja wyniesione na elewację.', en: 'A high-tech icon (1977) with services and structure on the façade.' } },
+  { id: 'a12', cat: 'architektura', q: { pl: 'Muzeum Guggenheima w Bilbao zaprojektował:', en: 'The Guggenheim Museum Bilbao was designed by:' },
+    a: [{ pl: 'Frank Gehry', en: 'Frank Gehry' }, { pl: 'Daniel Libeskind', en: 'Daniel Libeskind' }, { pl: 'Santiago Calatrava', en: 'Santiago Calatrava' }, { pl: 'Rafael Moneo', en: 'Rafael Moneo' }],
+    e: { pl: 'Otwarte w 1997 r.; jego wpływ na rozwój miasta nazwano „efektem Bilbao”.', en: 'Opened in 1997; its urban impact became known as the “Bilbao effect”.' } },
+  { id: 'a13', cat: 'architektura', q: { pl: 'Operę w Sydney zaprojektował:', en: 'The Sydney Opera House was designed by:' },
+    a: [{ pl: 'Jørn Utzon', en: 'Jørn Utzon' }, { pl: 'Alvar Aalto', en: 'Alvar Aalto' }, { pl: 'Arne Jacobsen', en: 'Arne Jacobsen' }, { pl: 'Harry Seidler', en: 'Harry Seidler' }],
+    e: { pl: 'Duński architekt wygrał konkurs w 1957 r.; Opera jest wpisana na listę UNESCO.', en: 'The Danish architect won the 1957 competition; the building is a UNESCO site.' } },
+  { id: 'a14', cat: 'architektura', q: { pl: 'Złota proporcja wynosi w przybliżeniu:', en: 'The golden ratio is approximately:' },
+    a: [{ pl: '1,618', en: '1.618' }, { pl: '1,414', en: '1.414' }, { pl: '1,5', en: '1.5' }, { pl: '3,14', en: '3.14' }],
+    e: { pl: '1,414 to √2 – proporcja boków formatów papieru serii A.', en: '1.414 is √2 – the side ratio of A-series paper.' } },
+  { id: 'a15', cat: 'architektura', q: { pl: 'Modulor – system proporcji oparty na wymiarach człowieka i złotej proporcji – opracował:', en: 'The Modulor – a proportion system based on the human body and the golden ratio – was devised by:' },
+    a: [{ pl: 'Le Corbusier', en: 'Le Corbusier' }, { pl: 'Ernst Neufert', en: 'Ernst Neufert' }, { pl: 'Leonardo da Vinci', en: 'Leonardo da Vinci' }, { pl: 'Jean Prouvé', en: 'Jean Prouvé' }],
+    e: { pl: 'Le Corbusier zastosował go m.in. w Jednostce Mieszkaniowej w Marsylii.', en: 'Le Corbusier applied it e.g. in the Unité d’Habitation in Marseille.' } },
+  { id: 'a16', cat: 'architektura', q: { pl: 'Hala Stulecia we Wrocławiu (lista UNESCO) jest dziełem:', en: 'Centennial Hall in Wrocław (UNESCO) was designed by:' },
+    a: [{ pl: 'Maxa Berga', en: 'Max Berg' }, { pl: 'Hansa Poelziga', en: 'Hans Poelzig' }, { pl: 'Ericha Mendelsohna', en: 'Erich Mendelsohn' }, { pl: 'Hansa Scharouna', en: 'Hans Scharoun' }],
+    e: { pl: 'Ukończona w 1913 r. żelbetowa kopuła; na liście UNESCO od 2006 r.', en: 'A reinforced-concrete dome completed in 1913; UNESCO-listed since 2006.' } },
+  { id: 'a17', cat: 'architektura', q: { pl: 'Spodek w Katowicach zaprojektowali:', en: 'The Spodek arena in Katowice was designed by:' },
+    a: [{ pl: 'Maciej Gintowt i Maciej Krasiński', en: 'Maciej Gintowt and Maciej Krasiński' }, { pl: 'Oskar i Zofia Hansenowie', en: 'Oskar and Zofia Hansen' },
+        { pl: 'Jerzy Sołtan i Zbigniew Ihnatowicz', en: 'Jerzy Sołtan and Zbigniew Ihnatowicz' }, { pl: 'Wojciech Zabłocki i Jerzy Hryniewiecki', en: 'Wojciech Zabłocki and Jerzy Hryniewiecki' }],
+    e: { pl: 'Hala otwarta w 1971 r., z nowatorskim dachem wiszącym.', en: 'Opened in 1971, with an innovative suspended roof.' } },
+  { id: 'a18', cat: 'architektura', q: { pl: 'Kaplicę Zygmuntowską na Wawelu zaprojektował:', en: 'The Sigismund Chapel at Wawel was designed by:' },
+    a: [{ pl: 'Bartolomeo Berrecci', en: 'Bartolomeo Berrecci' }, { pl: 'Francesco Fiorentino', en: 'Francesco Fiorentino' }, { pl: 'Santi Gucci', en: 'Santi Gucci' }, { pl: 'Giovanni Battista Quadro', en: 'Giovanni Battista Quadro' }],
+    e: { pl: 'Zbudowana w latach 1517–1533, nazywana „perłą renesansu na północ od Alp”.', en: 'Built in 1517–1533, called the “pearl of the Renaissance north of the Alps”.' } },
+  { id: 'a19', cat: 'architektura', q: { pl: 'Muzeum Historii Żydów Polskich POLIN w Warszawie zaprojektowała pracownia:', en: 'The POLIN Museum of the History of Polish Jews was designed by:' },
+    a: [{ pl: 'Lahdelma & Mahlamäki (Helsinki)', en: 'Lahdelma & Mahlamäki (Helsinki)' }, { pl: 'Studio Daniel Libeskind (Nowy Jork)', en: 'Studio Daniel Libeskind (New York)' },
+        { pl: 'Kengo Kuma and Associates (Tokio)', en: 'Kengo Kuma and Associates (Tokyo)' }, { pl: 'Stelmach i Partnerzy (Lublin)', en: 'Stelmach i Partnerzy (Lublin)' }],
+    e: { pl: 'Fińska pracownia wygrała konkurs w 2005 r.; budynek otwarto w 2013 r.', en: 'The Finnish practice won the 2005 competition; the building opened in 2013.' } },
+  { id: 'a20', cat: 'architektura', q: { pl: 'Nazwa brutalizmu pochodzi od francuskiego określenia:', en: 'The name “brutalism” comes from the French:' },
+    a: [{ pl: 'béton brut – surowy beton', en: 'béton brut – raw concrete' }, { pl: 'brutal – brutalny', en: 'brutal – brutal' }, { pl: 'bureau brut – surowe biuro', en: 'bureau brut – raw office' }, { pl: 'brut – wytrawny (szampan)', en: 'brut – dry (champagne)' }],
+    e: { pl: 'Le Corbusier używał „béton brut”, a pojęcie „nowy brutalizm” spopularyzował krytyk Reyner Banham.', en: 'Le Corbusier used “béton brut”; critic Reyner Banham popularised “New Brutalism”.' } },
+  { id: 'a21', cat: 'architektura', q: { pl: 'Które elementy są typowe dla architektury gotyckiej?', en: 'Which features are typical of Gothic architecture?' },
+    a: [{ pl: 'Ostrołuk, sklepienie żebrowe i przypory', en: 'Pointed arch, rib vault and buttresses' }, { pl: 'Kopuła na bębnie i kolumnada', en: 'Drum dome and colonnade' },
+        { pl: 'Łuk pełny i masywne mury bez przypór', en: 'Round arch and massive walls without buttresses' }, { pl: 'Fronton i porządek koryncki', en: 'Pediment and Corinthian order' }],
+    e: { pl: 'Dzięki przyporom i łukom przyporowym ściany mogły być cieńsze, z wielkimi witrażami. Łuk pełny to cecha romanizmu.', en: 'Buttresses and flying buttresses allowed thinner walls with large stained glass. The round arch is Romanesque.' } },
+  { id: 'a22', cat: 'architektura', q: { pl: 'Kapitel z dwiema dużymi wolutami (ślimacznicami) to cecha porządku:', en: 'A capital with two large volutes (scrolls) is typical of which order?' },
+    a: [{ pl: 'jońskiego', en: 'Ionic' }, { pl: 'doryckiego', en: 'Doric' }, { pl: 'toskańskiego', en: 'Tuscan' }, { pl: 'korynckiego', en: 'Corinthian' }],
+    e: { pl: 'Kapitel koryncki zdobią przede wszystkim liście akantu, a dorycki jest prosty, bez dekoracji.', en: 'Corinthian capitals feature acanthus leaves; Doric ones are plain.' } },
+  { id: 'a23', cat: 'architektura', q: { pl: 'Kościół Światła w Ibaraki (Japonia) zaprojektował:', en: 'The Church of the Light in Ibaraki, Japan, was designed by:' },
+    a: [{ pl: 'Tadao Ando', en: 'Tadao Ando' }, { pl: 'Kengo Kuma', en: 'Kengo Kuma' }, { pl: 'Toyo Ito', en: 'Toyo Ito' }, { pl: 'Shigeru Ban', en: 'Shigeru Ban' }],
+    e: { pl: 'Betonowa ściana z krzyżem wyciętym na wylot – światło staje się materiałem architektury.', en: 'A concrete wall with a cross cut right through it – light as building material.' } },
+  { id: 'a24', cat: 'architektura', q: { pl: 'Autorką książki „Śmierć i życie wielkich miast Ameryki” (1961) jest:', en: 'Who wrote “The Death and Life of Great American Cities” (1961)?' },
+    a: [{ pl: 'Jane Jacobs', en: 'Jane Jacobs' }, { pl: 'Denise Scott Brown', en: 'Denise Scott Brown' }, { pl: 'Rachel Carson', en: 'Rachel Carson' }, { pl: 'Lina Bo Bardi', en: 'Lina Bo Bardi' }],
+    e: { pl: 'Jacobs broniła żywych, różnorodnych ulic i krytykowała modernistyczną urbanistykę.', en: 'Jacobs defended lively, mixed streets and criticised modernist planning.' } },
+  { id: 'a25', cat: 'architektura', q: { pl: 'Ideę „miasta-ogrodu” sformułował:', en: 'The “garden city” idea was formulated by:' },
+    a: [{ pl: 'Ebenezer Howard', en: 'Ebenezer Howard' }, { pl: 'Le Corbusier', en: 'Le Corbusier' }, { pl: 'Camillo Sitte', en: 'Camillo Sitte' }, { pl: 'Georges-Eugène Haussmann', en: 'Georges-Eugène Haussmann' }],
+    e: { pl: 'Howard opisał ją pod koniec XIX w.; przykłady to Letchworth w Anglii i Podkowa Leśna pod Warszawą.', en: 'Howard described it in the late 19th century; examples include Letchworth and Podkowa Leśna near Warsaw.' } },
+  { id: 'a26', cat: 'architektura', q: { pl: 'Karta Ateńska CIAM (1933) propagowała:', en: 'The CIAM Athens Charter (1933) promoted:' },
+    a: [{ pl: 'Miasto funkcjonalne z rozdziałem stref mieszkania, pracy i wypoczynku', en: 'The functional city separating housing, work and leisure' },
+        { pl: 'Ochronę zabytkowych centrów przed jakąkolwiek nową zabudową', en: 'Protecting historic centres from any new development' },
+        { pl: 'Odbudowę zniszczonych miast w stylu historycznym sprzed wojny', en: 'Rebuilding destroyed cities in their pre-war historic styles' },
+        { pl: 'Zakaz wieżowców i powrót do tradycyjnej zabudowy kwartałowej', en: 'Banning high-rises and returning to traditional perimeter blocks' }],
+    e: { pl: 'Dokument powstał na kongresie CIAM w 1933 r. i był mocno związany z Le Corbusierem.', en: 'Drafted at the 1933 CIAM congress, strongly associated with Le Corbusier.' } },
+  // ---- Technika i fizyka budowli ----
+  { id: 't01', cat: 'technika', q: { pl: 'W jakich jednostkach podaje się współczynnik przenikania ciepła U?', en: 'What is the unit of the thermal transmittance U?' },
+    a: [{ pl: 'W/(m²·K)', en: 'W/(m²·K)' }, { pl: 'm²·K/W', en: 'm²·K/W' }, { pl: 'kWh/m²', en: 'kWh/m²' }, { pl: 'W/(m·K)', en: 'W/(m·K)' }],
+    e: { pl: 'm²·K/W to jednostka oporu cieplnego R, a W/(m·K) – współczynnika przewodzenia ciepła λ.', en: 'm²·K/W is thermal resistance R; W/(m·K) is thermal conductivity λ.' } },
+  { id: 't02', cat: 'technika', q: { pl: 'Im niższy współczynnik U przegrody, tym:', en: 'The lower a wall’s U-value, the:' },
+    a: [{ pl: 'Lepsza izolacyjność cieplna', en: 'Better its thermal insulation' }, { pl: 'Większe straty ciepła', en: 'Greater its heat loss' }, { pl: 'Gorsza izolacyjność akustyczna', en: 'Worse its sound insulation' }, { pl: 'Większa nośność', en: 'Higher its load capacity' }],
+    e: { pl: 'U mówi, ile ciepła przepływa przez 1 m² przegrody przy różnicy temperatur 1 K – mniej znaczy lepiej.', en: 'U tells how much heat passes through 1 m² per 1 K difference – lower is better.' } },
+  { id: 't03', cat: 'technika', q: { pl: 'Najwyższą klasę reakcji na ogień (wyroby niepalne) według PN-EN 13501-1 oznacza się symbolem:', en: 'The best reaction-to-fire class (non-combustible) under EN 13501-1 is:' },
+    a: [{ pl: 'A1', en: 'A1' }, { pl: 'B', en: 'B' }, { pl: 'E', en: 'E' }, { pl: 'F', en: 'F' }],
+    e: { pl: 'Skala sięga od A1 (niepalne) do F (właściwości niesklasyfikowane).', en: 'The scale runs from A1 (non-combustible) to F (no performance determined).' } },
+  { id: 't04', cat: 'technika', q: { pl: 'Co oznaczają litery R, E, I w klasyfikacji odporności ogniowej (np. REI 60)?', en: 'What do R, E and I mean in fire resistance classes (e.g. REI 60)?' },
+    a: [{ pl: 'Nośność, szczelność i izolacyjność ogniową', en: 'Load-bearing capacity, integrity and insulation' }, { pl: 'Rozprzestrzenianie, emisję i intensywność ognia', en: 'Spread, emission and intensity of fire' },
+        { pl: 'Reakcję, ewakuację i izolację', en: 'Reaction, evacuation and isolation' }, { pl: 'Rezystancję, energię i impedancję', en: 'Resistance, energy and impedance' }],
+    e: { pl: 'Liczba (np. 60) podaje, przez ile minut element spełnia te kryteria.', en: 'The number (e.g. 60) is how many minutes the element meets the criteria.' } },
+  { id: 't05', cat: 'technika', q: { pl: 'Wskaźnik Rw opisuje:', en: 'The Rw index describes:' },
+    a: [{ pl: 'Izolacyjność przegrody od dźwięków powietrznych', en: 'Airborne sound insulation of a partition' }, { pl: 'Izolacyjność stropu od dźwięków uderzeniowych', en: 'Impact sound insulation of a floor' },
+        { pl: 'Opór cieplny przegrody zewnętrznej', en: 'Thermal resistance of an external wall' }, { pl: 'Współczynnik odbicia światła od ściany', en: 'Light reflectance of a wall' }],
+    e: { pl: 'Dźwięki uderzeniowe opisuje wskaźnik poziomu uderzeniowego (L’n,w) – im niższy, tym lepiej.', en: 'Impact sound is described by the impact level index (L’n,w) – lower is better.' } },
+  { id: 't06', cat: 'technika', q: { pl: 'Otwarty format wymiany modeli BIM między programami to:', en: 'The open format for exchanging BIM models between programs is:' },
+    a: [{ pl: 'IFC', en: 'IFC' }, { pl: 'DWG', en: 'DWG' }, { pl: 'PDF', en: 'PDF' }, { pl: 'SKP', en: 'SKP' }],
+    e: { pl: 'IFC (Industry Foundation Classes) rozwija buildingSMART; to także norma ISO 16739.', en: 'IFC (Industry Foundation Classes) is developed by buildingSMART and standardised as ISO 16739.' } },
+  { id: 't07', cat: 'technika', q: { pl: 'Mostek cieplny to:', en: 'A thermal bridge is:' },
+    a: [{ pl: 'Miejsce przegrody o zwiększonym przepływie ciepła', en: 'An area of the envelope with increased heat flow' }, { pl: 'Konstrukcyjny łącznik między dwoma budynkami', en: 'A structural link between two buildings' },
+        { pl: 'Rodzaj wodnego ogrzewania płaszczyznowego', en: 'A type of hydronic surface heating' }, { pl: 'Izolowany przewód wentylacji mechanicznej', en: 'An insulated mechanical ventilation duct' }],
+    e: { pl: 'Mostki (np. przy balkonach i nadprożach) zwiększają straty ciepła i grożą kondensacją oraz pleśnią.', en: 'Bridges (e.g. at balconies and lintels) increase heat loss and risk condensation and mould.' } },
+  { id: 't08', cat: 'technika', q: { pl: 'Seria norm PN-EN ISO 19650 dotyczy:', en: 'The PN-EN ISO 19650 series covers:' },
+    a: [{ pl: 'Zarządzania informacją w procesie BIM', en: 'Information management with BIM' }, { pl: 'Akustyki budowlanej', en: 'Building acoustics' },
+        { pl: 'Projektowania konstrukcji stalowych', en: 'Steel structure design' }, { pl: 'Oświetlenia awaryjnego', en: 'Emergency lighting' }],
+    e: { pl: 'Opisuje organizację i cyfryzację informacji o obiektach budowlanych w całym cyklu życia.', en: 'It covers organising and digitising building information across the whole life cycle.' } }
+];
+
 const NORM_CATS = ['konstrukcje', 'cieplne', 'akustyka', 'swiatlo', 'ppoz', 'dostepnosc', 'wentylacja', 'dokumentacja', 'zrownowazone', 'instalacje', 'wyroby'];
 const ICS_GROUPS = ['91.010', '91.020', '91.040', '91.060', '91.080', '91.090', '91.100', '91.120', '91.140', '91.160', '91.180', '91.190', '91.200', '91.220', '93'];
 
@@ -671,6 +1001,12 @@ const I18N = {
            '91.180': 'Wykończenie wnętrz', '91.190': 'Akcesoria budowlane', '91.200': 'Technologia budowy', '91.220': 'Sprzęt budowlany',
            '93': 'Inżynieria lądowa (drogi, mosty, roboty ziemne)' },
     normsNote: 'Polskie Normy wydaje i sprzedaje PKN, który nie udostępnia ich listy w otwartej formie – aktualne wydanie sprawdzisz przyciskiem „Wydanie w PKN”. Treść norm jest płatna; bezpłatnie przeczytasz je w czytelni PKN, a wiele bibliotek uczelni technicznych daje studentom dostęp do norm online. Stosowanie Polskich Norm jest dobrowolne, chyba że przepis (np. Warunki Techniczne) powołuje konkretną normę. Normy ISO pochodzą z ISO Open Data.',
+    qzTitle: 'Pytanie dnia', qzPracticeLbl: 'Tryb ćwiczeń',
+    qzCats: { prawo: 'Prawo budowlane', planowanie: 'Planowanie przestrzenne', architektura: 'Architektura i urbanistyka', technika: 'Technika i fizyka budowli', zawod: 'Zawód architekta', ue: 'Prawo UE' },
+    qzGood: 'Dobrze!', qzBad: 'Niestety nie.', qzCorrectIs: 'Poprawna odpowiedź: {n}.', qzSource: 'Podstawa',
+    qzPractice: 'Ćwicz: losowe pytanie', qzBack: 'Wróć do pytania dnia', qzNext: 'Kolejne pytanie dnia jutro.',
+    qzStreak1: 'seria: 1 dzień', qzStreak: 'seria: {n} dni', qzScore: 'poprawne: {a}/{b}',
+    qzNote: 'Pytania mają charakter edukacyjny. Przepisy według tekstów jednolitych z 2026 r. – przed zastosowaniem w projekcie sprawdź aktualny stan prawny.',
     evTitle: 'Wydarzenia',
     evSub: 'Targi, konferencje i festiwale architektury i budownictwa w Polsce i na świecie. Terminy sprawdzone u organizatorów i w serwisach branżowych – przed wyjazdem potwierdź je na stronie wydarzenia.',
     evRegion: { all: 'Wszystkie', pl: 'Polska', swiat: 'Świat' },
@@ -754,6 +1090,12 @@ const I18N = {
            '91.180': 'Interior finishing', '91.190': 'Building accessories', '91.200': 'Construction technology', '91.220': 'Construction equipment',
            '93': 'Civil engineering (roads, bridges, earthworks)' },
     normsNote: 'Polish Standards are published and sold by PKN, which does not offer an open list – check the current edition with the “Edition at PKN” button. Standards are paid; you can read them for free in the PKN reading room, and many technical university libraries give students online access. Applying Polish Standards is voluntary unless a regulation (e.g. the Technical Conditions) refers to a specific one. ISO data comes from ISO Open Data.',
+    qzTitle: 'Question of the day', qzPracticeLbl: 'Practice mode',
+    qzCats: { prawo: 'Construction law', planowanie: 'Spatial planning', architektura: 'Architecture & urbanism', technika: 'Building technology & physics', zawod: 'Architectural profession', ue: 'EU law' },
+    qzGood: 'Correct!', qzBad: 'Not quite.', qzCorrectIs: 'The correct answer is {n}.', qzSource: 'Source',
+    qzPractice: 'Practice: random question', qzBack: 'Back to today’s question', qzNext: 'A new question of the day tomorrow.',
+    qzStreak1: 'streak: 1 day', qzStreak: 'streak: {n} days', qzScore: 'correct: {a}/{b}',
+    qzNote: 'Questions are for learning. Polish law as per the 2026 consolidated texts – check the current legal status before applying it in a project.',
     evTitle: 'Events',
     evSub: 'Trade fairs, conferences and festivals on architecture and construction in Poland and worldwide. Dates checked with organisers and industry listings – confirm them on the event website before you travel.',
     evRegion: { all: 'All', pl: 'Poland', swiat: 'World' },
@@ -954,6 +1296,7 @@ function setLang(l) {
   renderNews();
   renderEvents();
   renderNorms();
+  renderQuiz();
 }
 
 /* ============ POBIERANIE ============ */
@@ -1558,6 +1901,113 @@ function renderNorms() {
   reveal(box);
 }
 
+/* ============ PYTANIE DNIA – WIDOK ============ */
+const LS_QUIZ = 'prawo-planu:quiz';
+function seededRand(seed) {          // mulberry32 – powtarzalne „losowanie”
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const hashStr = s => { let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+function seededShuffle(arr, seed) {
+  const a = arr.slice(), r = seededRand(seed);
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+// Kolejność pytań w kolejnych dniach jest stała (ta sama dla wszystkich odwiedzających),
+// a kategorie się przeplatają: prawo, architektura, technika, planowanie…
+const QZ_ORDER = (() => {
+  const byCat = {};
+  seededShuffle(QUIZ.map((_, i) => i), 2026).forEach(i => { (byCat[QUIZ[i].cat] = byCat[QUIZ[i].cat] || []).push(i); });
+  // każda kategoria rozłożona równomiernie na cały cykl (pozycja = (k + przesunięcie) / liczba pytań w kategorii)
+  const slots = [];
+  Object.keys(byCat).sort().forEach((c, ci, all) => {
+    const list = byCat[c];
+    list.forEach((i, k) => slots.push({ i, key: (k + 0.5 + ci / all.length / 2) / list.length }));
+  });
+  return slots.sort((a, b) => a.key - b.key).map(s => s.i);
+})();
+const dayKey = n => new Date(n * 864e5).toISOString().slice(0, 10);
+const quizToday = () => QUIZ[QZ_ORDER[((dayNum(TODAY) % QUIZ.length) + QUIZ.length) % QUIZ.length]];
+// Poprawna odpowiedź (indeks 0) trafia po równo na A, B, C i D; błędne są tasowane
+function optOrder(q) {
+  const order = seededShuffle([1, 2, 3], hashStr(q.id));
+  order.splice(QUIZ.indexOf(q) % 4, 0, 0);
+  return order;
+}
+function quizLoad() { try { return JSON.parse(localStorage.getItem(LS_QUIZ)) || { d: {} }; } catch (e) { return { d: {} }; } }
+function quizSave(s) { try { localStorage.setItem(LS_QUIZ, JSON.stringify(s)); } catch (e) { /* brak pamięci przeglądarki */ } }
+const quizState = { practice: null, practiceAnswer: null };
+
+function quizStats(s) {
+  const days = Object.keys(s.d || {});
+  let streak = 0, cur = dayNum(TODAY);
+  if (!s.d[TODAY]) cur -= 1;                     // dziś jeszcze bez odpowiedzi – seria liczona do wczoraj
+  while (s.d[dayKey(cur)]) { streak++; cur--; }
+  return { total: days.length, good: days.filter(k => s.d[k].ok).length, streak };
+}
+
+function renderQuiz() {
+  const box = $('#quiz');
+  if (!box) return;
+  const s = quizLoad();
+  const practice = quizState.practice != null;
+  const q = practice ? QUIZ[quizState.practice] : quizToday();
+  const saved = s.d[TODAY];
+  const ans = practice ? quizState.practiceAnswer : (saved && saved.id === q.id ? saved.c : null);
+  const tx = x => (x && (x[lang] || x.pl)) || '';
+  const order = optOrder(q), letters = 'ABCD', answered = ans != null;
+
+  const opts = order.map((oi, pos) => {
+    let cls = 'qz-opt';
+    if (answered) cls += oi === 0 ? ' is-ok' : (oi === ans ? ' is-bad' : ' is-dim');
+    return `<button type="button" class="${cls}" data-opt="${oi}"${answered ? ' disabled' : ''}><span class="k">${letters[pos]}</span><span>${esc(tx(q.a[oi]))}</span></button>`;
+  }).join('');
+
+  let res = '';
+  if (answered) {
+    const ok = ans === 0;
+    const src = q.src && QZ_SRC[q.src[0]]
+      ? `<p class="qz-src">${esc(T.qzSource)}: <a href="${esc(QZ_SRC[q.src[0]].url)}" target="_blank" rel="noopener">${esc(tx(QZ_SRC[q.src[0]]))}${q.src[1] ? ', ' + esc(q.src[1]) : ''}</a></p>` : '';
+    res = `<div class="qz-res ${ok ? 'ok' : 'bad'}"><b class="v">${esc(ok ? T.qzGood : T.qzBad)}</b> ${esc(fill(T.qzCorrectIs, letters[order.indexOf(0)]))}<p>${esc(tx(q.e))}</p>${src}</div>` +
+      `<div class="qz-actions"><button type="button" class="btn-ghost" data-qz="practice">${esc(T.qzPractice)}</button>` +
+      (practice ? `<button type="button" class="btn-ghost" data-qz="today">${esc(T.qzBack)}</button>` : `<span>${esc(T.qzNext)}</span>`) + `</div>`;
+  }
+  const st = quizStats(s);
+  const stats = st.total ? `${st.streak === 1 ? T.qzStreak1 : fill(T.qzStreak, st.streak)} · ${T.qzScore.replace('{a}', st.good).replace('{b}', st.total)}` : '';
+  const eyebrow = practice ? `${T.qzPracticeLbl} · ${T.qzCats[q.cat]}` : `${T.qzTitle} · ${fmtDate(TODAY)} · ${T.qzCats[q.cat]}`;
+  box.innerHTML = `<div class="qz-top"><span class="lbl">${esc(eyebrow)}</span><span class="qz-stats">${esc(stats)}</span></div>` +
+    `<p class="qz-q">${esc(tx(q.q))}</p><div class="qz-opts">${opts}</div>${res}<p class="qz-note">${esc(T.qzNote)}</p>`;
+}
+
+function quizClick(e) {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.opt != null) {
+    const oi = +b.dataset.opt;
+    if (quizState.practice != null) quizState.practiceAnswer = oi;
+    else {
+      const s = quizLoad(), q = quizToday();
+      if (!s.d[TODAY]) { s.d[TODAY] = { id: q.id, c: oi, ok: oi === 0 }; quizSave(s); }   // liczy się pierwsza odpowiedź
+    }
+  } else if (b.dataset.qz === 'practice') {
+    const todayIdx = QUIZ.indexOf(quizToday());
+    let i;
+    do { i = Math.floor(Math.random() * QUIZ.length); } while (QUIZ.length > 2 && (i === todayIdx || i === quizState.practice));
+    quizState.practice = i;
+    quizState.practiceAnswer = null;
+  } else if (b.dataset.qz === 'today') {
+    quizState.practice = null;
+    quizState.practiceAnswer = null;
+  } else return;
+  renderQuiz();
+}
+
 /* ============ WYDARZENIA – WIDOK ============ */
 const evState = { region: 'all', type: '', past: false };
 const evName = e => typeof e.name === 'string' ? e.name : (e.name[lang] || e.name.pl);
@@ -1710,7 +2160,7 @@ const photoSrcset = src => [960, 1280, 1920].map(w => `${src.replace('/1280px-',
 function renderBanners() {
   document.querySelectorAll('section.sheet[data-tab]').forEach(sec => {
     const p = PHOTOS[sec.dataset.tab];
-    if (!p) return;
+    if (!p || sec.hasAttribute('data-nobanner')) return;
     let fig = sec.firstElementChild && sec.firstElementChild.matches('figure.banner') ? sec.firstElementChild : null;
     if (!fig) {
       fig = document.createElement('figure');
@@ -1795,6 +2245,7 @@ $('#s-wydarzenia').addEventListener('click', e => {
   renderEvents();
 });
 $('#ev-past').addEventListener('change', () => { evState.past = $('#ev-past').checked; renderEvents(); });
+$('#quiz').addEventListener('click', quizClick);
 $('#refresh').addEventListener('click', () => { run().catch(fail); loadNews(); });
 $('#s-newsy').addEventListener('click', e => {
   const b = e.target.closest('button');
@@ -1817,6 +2268,7 @@ loadNews();
 renderNorms();
 loadNorms();
 renderEvents();
+renderQuiz();
 })();
 </script>
 </body>
