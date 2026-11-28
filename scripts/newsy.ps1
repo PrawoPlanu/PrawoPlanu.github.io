@@ -36,6 +36,11 @@ $Sources = @(
        url = 'https://news.google.com/rss/search?q=' + [uri]::EscapeDataString('(architecture OR architect OR "urban planning" OR "building code" OR "construction industry" OR "housing construction") -software -cloud -enterprise when:1d') + '&hl=en-US&gl=US&ceid=US:en' }
     @{ id = 'gn-polska';   name = 'Google News';                region = 'polska';  site = 'https://news.google.com'; aggregator = $true
        url = 'https://news.google.com/rss/search?q=' + [uri]::EscapeDataString('(architektura OR architekt OR budownictwo OR "prawo budowlane" OR "plan ogólny" OR "warunki techniczne" OR deweloper) when:2d') + '&hl=pl&gl=PL&ceid=PL:pl' }
+    # Zapowiedzi i relacje z wydarzeń (zakładka „Wydarzenia”)
+    @{ id = 'gn-wyd-polska'; name = 'Google News'; region = 'polska'; site = 'https://news.google.com'; aggregator = $true; topic = 'wydarzenia'
+       url = 'https://news.google.com/rss/search?q=' + [uri]::EscapeDataString('(targi OR konferencja OR kongres OR festiwal OR biennale) (architektura OR architektury OR budownictwo OR budowlane OR design) when:14d') + '&hl=pl&gl=PL&ceid=PL:pl' }
+    @{ id = 'gn-wyd-swiat';  name = 'Google News'; region = 'swiat';  site = 'https://news.google.com'; aggregator = $true; topic = 'wydarzenia'
+       url = 'https://news.google.com/rss/search?q=' + [uri]::EscapeDataString('("trade fair" OR expo OR conference OR festival OR biennale) (architecture OR construction OR "built environment") -software -cloud when:7d') + '&hl=en-US&gl=US&ceid=US:en' }
 )
 
 # Szum: „architektura” w znaczeniu IT, finansów itp.
@@ -112,7 +117,9 @@ foreach ($src in $Sources) {
 
             $date = ConvertTo-UtcIso (Get-NodeText $n 'pubDate,published,updated,date')
             if (-not $date) { continue }
-            if ([DateTime]::Parse($date).ToUniversalTime() -lt $cutoff) { continue }
+            $limit = $cutoff
+            if ($src.topic -eq 'wydarzenia') { $limit = (Get-Date).ToUniversalTime().AddDays(-14) }   # zapowiedzi wydarzeń: 14 dni
+            if ([DateTime]::Parse($date).ToUniversalTime() -lt $limit) { continue }
 
             $outlet = $src.name
             $summary = ''
@@ -134,6 +141,7 @@ foreach ($src in $Sources) {
                 outlet  = $outlet
                 via     = $(if ($src.aggregator) { 'Google News' } else { '' })
                 region  = $src.region
+                topic   = $(if ($src.topic) { $src.topic } else { 'news' })
                 title   = $title
                 link    = $link
                 date    = $date
